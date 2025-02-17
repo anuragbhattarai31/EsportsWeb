@@ -8,7 +8,7 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: "http://localhost:5174"
+    origin: "http://localhost:5173"
 }));
 
 const PORT = process.env.PORT || 5000;
@@ -16,45 +16,50 @@ const PORT = process.env.PORT || 5000;
 // 🟢 User Registration
 app.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
+    console.log("Received Registration Request:", { username, email });
 
-    // Add server-side email validation
     const semoEmailRegex = /@semo\.edu$/i;
     if (!semoEmailRegex.test(email)) {
+        console.log("Invalid email:", email);
         return res.status(400).json({ error: "Only @semo.edu emails are allowed" });
     }
 
     try {
-        // Check if email already exists
+        console.log("Checking if email exists...");
         const existingUser = await pool.query(
             "SELECT * FROM users WHERE email = $1",
             [email]
         );
+
+        console.log("Existing User Query Result:", existingUser.rows);
         
         if (existingUser.rows.length > 0) {
+            console.log("Email already exists:", email);
             return res.status(400).json({ error: "Email already registered" });
         }
-
-        // ... existing registration logic ...
     } catch (err) {
-        console.error("Error registering user:", err);
-        res.status(500).json({ error: "Error registering user" });
+        console.error("Database Error Checking User:", err);
+        return res.status(500).json({ error: "Database error while checking email" });
     }
-    
-    
 
     try {
+        console.log("Hashing password...");
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        console.log("Inserting new user...");
         const newUser = await pool.query(
             "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email",
             [username, email, hashedPassword]
         );
 
+        console.log("User registered successfully:", newUser.rows[0]);
         res.status(201).json({ message: "User registered", user: newUser.rows[0] });
     } catch (err) {
-        console.error("Error registering user:", err); // Log the error
+        console.error("Error registering user:", err);
         res.status(500).json({ error: "Error registering user" });
     }
 });
+
 
 // 🟢 User Login
 app.post("/login", async (req, res) => {
