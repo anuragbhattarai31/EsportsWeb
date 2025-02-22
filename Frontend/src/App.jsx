@@ -3,18 +3,27 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './Auth/Login';
 import Register from './Auth/register'; // Ensure the case matches the filename
 import Dashboard from './Pages/Dashboard';
-import './App.css';
+import AdminDashboard from './Pages/Admin-Dashboard';
+import Footer from './Components/Footer';
+import Header from './Components/Header';
+import './index.css';
 
 const App = () => {
   return (
     <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard/>}/>
-          <Route path="/" element={<Login />} /> {/* Default route */}
+       <div className="min-h-screen flex flex-col">
+        <Header/>
+       <main className="flex-grow">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard/>}/>
+            <Route path="/adminDashboard" element = {<AdminDashboard/>} />
+            <Route path="/" element={<Login />} /> {/* Default route */}
+          
         </Routes>
+        </main>
+        <Footer/>
       </div>
     </Router>
   );
