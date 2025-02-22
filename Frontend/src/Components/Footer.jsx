@@ -2,12 +2,12 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-12 border-t-3 border-red-600">
+    <footer className="bg-gray-900 text-white py-12 border-t-3 border-semored">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Section */}
         <div className="flex flex-col items-center">
           <div className="font-bold text-center mb-4">
-            <div className="text-red-600 text-4xl">SE</div>
+            <div className="text-semored text-4xl">SE</div>
             <div className="text-white text-3xl">MO</div>
           </div>
           <p className="text-sm text-center">
@@ -18,7 +18,7 @@ const Footer = () => {
 
         {/* Middle Section */}
         <div className="text-center">
-          <h3 className="text-red-600 text-xl font-bold mb-4">CONNECT WITH US</h3>
+          <h3 className="text-semored text-xl font-bold mb-4">CONNECT WITH US</h3>
           <p className="leading-relaxed">
             Esports Collegiate<br />
             123 University Drive<br />
