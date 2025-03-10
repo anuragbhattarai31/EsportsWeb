@@ -6,6 +6,10 @@ const pool = require("../db");
 const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+   }
+
     // Server-side email validation
     const semoEmailRegex = /@semo\.edu$/i;
     if (!semoEmailRegex.test(email)) {
@@ -31,11 +35,15 @@ const registerUser = async (req, res) => {
         res.status(500).json({ error: "Error registering user" });
     }
 };
-
+     
 // User Login
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+      }
 
     try {
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);

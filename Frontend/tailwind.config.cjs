@@ -5,10 +5,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        semored: '#C8102E',
-        semoblack: '#000000',
-      },
+      colors: { // Ensure blue colors exist
+        semored: "#C8102E",
+        semoblack: "#000000",
+      }
     },
   },
   plugins: [],

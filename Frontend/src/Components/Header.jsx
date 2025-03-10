@@ -28,25 +28,42 @@ const Header = () => {
     setIsUserDropdownOpen(false);
   };
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+  
 
-      try {
-        const response = await fetch('http://localhost:5000/api/auth/user', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setUsername(data.username);
-        } else {
-          console.error('Error fetching user details:', data.error);
-        }
-      } catch (error) {
-        console.error('Error fetching user details:', error);
+  useEffect(() => {
+   // Update the fetchUserDetails function
+const fetchUserDetails = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/user', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      // Handle 401 Unauthorized (invalid token)
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        window.location.reload();
       }
-    };
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setUsername(data.username);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    // Handle JSON parse errors
+    if (error instanceof SyntaxError) {
+      console.error('Invalid JSON response from server');
+    }
+  }
+};
 
     fetchUserDetails();
   }, []);
@@ -95,10 +112,10 @@ const Header = () => {
           onMouseEnter={handleUserMouseEnter}
           onMouseLeave={handleUserMouseLeave}
         >
-          <div className="cursor-pointer">{username || 'Username'}</div>
+          <div className="cursor-pointer">{username || 'Guest'}</div>
           <div className={`absolute top-full right-0 min-w-[150px] bg-semoblack text-white p-4 rounded-lg shadow-lg transition-transform duration-150 easeout transform origin-top ${isUserDropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'}`}>
             <a href="#" className="block py-2 hover:text-semored">Profile</a>
-            <a href="#" className="block py-2 hover:text-red-500">Logout</a>
+            <a href="#" className="block py-2 hover:text-red-500" onClick = {handleLogout}>Logout</a>
           </div>
         </div>
         <div className="md:hidden">

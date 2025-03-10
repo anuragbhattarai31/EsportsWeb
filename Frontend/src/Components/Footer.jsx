@@ -20,8 +20,8 @@ const Footer = () => {
         <div className="text-center">
           <h3 className="text-semored text-xl font-bold mb-4">CONNECT WITH US</h3>
           <p className="leading-relaxed">
-            Esports Collegiate<br />
-            123 University Drive<br />
+            SEMO Esports<br />
+            1000 Towers Circle<br />
             Cape Girardeau, MO 63701<br />
             (573) 555-ESPT
           </p>

@@ -8,6 +8,7 @@ import Footer from './Components/Footer';
 import Header from './Components/Header';
 import './index.css';
 
+
 const App = () => {
   return (
     <Router>
@@ -19,7 +20,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/adminDashboard" element = {<AdminDashboard/>} />
-            <Route path="/" element={<Login />} /> {/* Default route */}
+            <Route path="/" element={< Login/>} /> {/* Default route */}
           
         </Routes>
         </main>
