@@ -6,7 +6,7 @@ import {format, set} from 'date-fns'
 import Header from '../Components/Header';
 
 
-
+//This creats admin dashboard page
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [stats, setStats] = useState({
@@ -48,7 +48,7 @@ const fetchApprovedMembers = async () => {
 };
 
 
-// Add new fetch function
+// Add new fetch functions for registrations
 const fetchRegistrations = async () => {
   try {
     const response = await fetch('http://localhost:5000/api/club-registrations/admin/pending', {
