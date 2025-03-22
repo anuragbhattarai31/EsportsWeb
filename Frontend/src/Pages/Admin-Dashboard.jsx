@@ -17,6 +17,10 @@ const AdminDashboard = () => {
 
 const [loadingStats, setLoadingStats] = useState(true);
 const [loadingBookings, setLoadingBookings] = useState(true);
+const [registrations, setRegistrations] = useState([]);
+const [selectedRegistration, setSelectedRegistration] = useState(null);
+const [approvedMembers, setApprovedMembers] = useState([]);
+const [loadingMembers, setLoadingMembers] = useState(false);
   
   // New states for device/booking management
 const [devices, setDevices] = useState([]);
@@ -27,6 +31,37 @@ const [newDevice, setNewDevice] = useState({
     specs: '' 
 });
 const navigate = useNavigate();
+
+
+const fetchApprovedMembers = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/club-registrations/admin/approved', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    setApprovedMembers(data);
+  } catch (error) {
+    console.error('Failed to fetch members:', error);
+  } finally {
+    setLoadingMembers(false);
+  }
+};
+
+
+// Add new fetch function
+const fetchRegistrations = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/club-registrations/admin/pending', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    setRegistrations(data);
+  } catch (error) {
+    console.error('Failed to fetch registrations:', error);
+  }
+};
+
+
 
   const fetchStats = async () => {
     try {
@@ -144,6 +179,28 @@ const fetchDevicesAndBookings = async () => {
     }
   }
 
+  // Add new handler function
+const handleRegistrationDecision = async (id, status) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/club-registrations/admin/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    if (response.ok) {
+      setRegistrations(registrations.filter(reg => reg.id !== id));
+      fetchStats(); // Refresh stats
+    }
+  } catch (error) {
+    console.error('Failed to update registration:', error);
+  }
+};
+
+
   useEffect(() => {
     const fetchDashboard = async () => {
       const token = localStorage.getItem('token');
@@ -170,6 +227,8 @@ const fetchDevicesAndBookings = async () => {
           setDashboardData(data);
           fetchStats();
           fetchDevicesAndBookings();
+          fetchRegistrations();
+          fetchApprovedMembers();
           setLoadingStats(false);
 
           
@@ -217,9 +276,59 @@ const fetchDevicesAndBookings = async () => {
                 </div>
               </div>
             </div>
+
+
+
+
   
             {/* Management Tabs */}
-            <Tabs defaultActiveKey="devices" className="mb-4">
+      <Tabs defaultActiveKey="devices" className="mb-4">
+              <Tab eventKey="registrations" title="Club Registrations">
+              <div className="mt-4">
+                  {registrations.length === 0 ? (
+                   <p className="text-gray-500 p-4">No pending registrations</p>
+                      ) : (
+              <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Name</th>
+                    <th className="px-4 py-2 text-left">SEMO ID</th>
+                    <th className="px-4 py-2 text-left">Email</th>
+                    <th className="px-4 py-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {registrations.map(reg => (
+                    <tr key={reg.id} className="border-t hover:bg-gray-50">
+                    <td className="px-4 py-2">{reg.full_name}</td>
+                    <td className="px-4 py-2">{reg.semo_id}</td>
+                    <td className="px-4 py-2">{reg.email}</td>
+                    <td className="px-4 py-2 space-x-2">
+                  <button
+                    onClick={() => handleRegistrationDecision(reg.id, 'approved')}
+                    className="px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleRegistrationDecision(reg.id, 'rejected')}
+                    className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200"
+                  >
+                    Reject
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+
+              </Tab>
+
+
               <Tab eventKey="devices" title="Manage Devices">
                 <div className="row mt-4">
                   {/* Add Device Form */}
@@ -358,8 +467,44 @@ const fetchDevicesAndBookings = async () => {
     </div>
   )}
 </Tab>
-              
-            </Tabs>
+ 
+<Tab eventKey="members" title="Club Members">
+    <div className="mt-4">
+      {loadingMembers ? (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
+      ) : approvedMembers.length === 0 ? (
+        <p className="text-gray-500 p-4">No approved members found</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left">Name</th>
+                <th className="px-4 py-2 text-left">SEMO ID</th>
+                <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Registration Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {approvedMembers.map(member => (
+                <tr key={member.id} className="border-t hover:bg-gray-50">
+                  <td className="px-4 py-2">{member.full_name}</td>
+                  <td className="px-4 py-2">{member.semo_id}</td>
+                  <td className="px-4 py-2">{member.email}</td>
+                  <td className="px-4 py-2">
+                    {format(new Date(member.created_at), 'MMM d, yyyy HH:mm')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </Tab>
+             </Tabs>
           </div>
         ) : (
           <div className="text-center py-12">

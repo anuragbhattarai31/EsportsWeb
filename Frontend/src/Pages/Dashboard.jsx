@@ -6,6 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Header from '../Components/Header';
 
 const Dashboard = () => {
+  const [registrationStatus, setRegistrationStatus] = useState('');
   const [dashboardData, setDashboardData] = useState(null);
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -185,6 +186,33 @@ const Dashboard = () => {
     fetchBookings();
   }, [navigate]);
 
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/club-registrations', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+  
+        if (response.status === 404) {
+          setRegistrationStatus('not_registered');
+          return;
+        }
+  
+        if (!response.ok) throw new Error('Status check failed');
+  
+        const data = await response.json();
+        setRegistrationStatus(data.status);
+      } catch (error) {
+        console.error('Registration check error:', error);
+        setRegistrationStatus('error');
+      }
+    };
+  
+    checkRegistrationStatus();
+  }, []);
+
   //CANCEL-BOOKING Function
 
   const cancelBooking = async (bookingId) => {
@@ -218,6 +246,73 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-100">
       <Header/>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pt-20">
+       {/* Add Registration Status Section */}
+       {registrationStatus && registrationStatus !== 'approved' && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Club Membership</h2>
+          {registrationStatus === 'not_registered' ? (
+        <div>
+            <p className="mb-4">Lets, Register for the esports club!!</p>
+        <button 
+          onClick={() => navigate('/club-registration')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Register for Club
+        </button>
+      </div>
+    ) : registrationStatus === 'error' ? (
+      <p className="text-red-500">Error checking registration status</p>
+    ) : (
+      <p className="text-lg">
+        Your club registration status: 
+        <span className={`ml-2 px-3 py-1 rounded-full ${
+          registrationStatus === 'pending' 
+            ? 'bg-yellow-100 text-yellow-800' : 
+            'bg-red-100 text-red-800'
+        }`}>
+          {registrationStatus}
+        </span>
+      </p>
+    )}
+  </div>
+)}
+{registrationStatus === 'approved' && (
+  <div className="bg-white rounded-lg shadow-md p-6">
+    <h2 className="text-xl font-semibold mb-4">Club Membership</h2>
+    <p className="text-lg mb-4">
+      Your club registration status: 
+      <span className="ml-2 px-3 py-1 rounded-full bg-green-100 text-green-800">
+        Approved
+      </span>
+    </p>
+    
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Join Our Communities</h3>
+      <div className="flex gap-4">
+        <a
+          href="https://www.twitch.tv/semoesports"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 flex items-center gap-2"
+        >
+          <span>Twitch</span>
+        </a>
+        <a
+          href="https://discord.gg/EKDjShyEMY"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+        >
+          <span>Discord</span>
+        </a>
+      </div>
+      <p className="text-sm text-gray-600">
+        Connect with other members and stay updated on events!
+      </p>
+    </div>
+  </div>
+)}
+
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">New Booking</h2>
           

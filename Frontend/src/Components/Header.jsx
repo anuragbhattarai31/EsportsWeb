@@ -128,14 +128,6 @@ const Header = () => {
             </div>
           </div>
         </div>
-        <nav className="space-x-6 hidden md:flex">
-          <a href="#" className="hover:text-semored">
-            Home
-          </a>
-          <a href="#" className="hover:text-semored">
-            Dashboard
-          </a>
-        </nav>
         <div className="relative" onMouseEnter={handleUserMouseEnter} onMouseLeave={handleUserMouseLeave}>
           <div className="cursor-pointer">{username || "Guest"}</div>
           <div

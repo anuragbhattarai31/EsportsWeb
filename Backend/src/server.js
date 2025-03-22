@@ -5,6 +5,7 @@ const pool = require("./db"); // Import PostgreSQL connection
 const authRoutes = require("./routes/authRoutes"); // Import auth rout
 const bookingRoutes = require("./routes/bookingRoutes"); // Import booking routes
 const adminRoutes = require("./routes/adminRoutes"); // Import admin routes
+const clubRegistrationRoutes = require('./routes/clubRegistrationRoutes');
 
 dotenv.config();
 const cron = require('node-cron');
@@ -27,6 +28,7 @@ const corsOptions = {
 app.use("/api/auth", authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/club-registrations', clubRegistrationRoutes);
 
 // Test Database Connection
 pool.connect()

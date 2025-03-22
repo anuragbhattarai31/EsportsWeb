@@ -7,6 +7,7 @@ import AdminDashboard from './Pages/Admin-Dashboard';
 import Footer from './Components/Footer';
 import Header from './Components/Header';
 import LandingPage from './Pages/landingpage';
+import ClubRegistration from './Pages/ClubRegistration';
 import './index.css';
 
 
@@ -21,6 +22,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/adminDashboard" element = {<AdminDashboard/>} />
+            <Route path="/club-registration" element={<ClubRegistration />} />
             <Route path="/" element={< LandingPage/>} /> {/* Default route */}
           
         </Routes>
