@@ -1,325 +1,361 @@
+"use client"
 
-import { useRef } from "react"
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls, PerspectiveCamera, Environment } from "@react-three/drei"
-import { Button } from "@/Components/ui/button"
-import { Card, CardContent } from "@/Components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import { Calendar, Gamepad2, ExternalLink, Clock } from "lucide-react"
 
+const LandingPage = () => {
+  const [availableStations, setAvailableStations] = useState(0)
 
-
-
-export default function LandingPage() {
-  const navigate = useNavigate()
-
-  const handleRegister = () => {
-    navigate("/register");
-  }
-
-  const handleLogin = () => {
-    navigate("/login");
-  } 
-
-  const newsSliderRef = useRef(null)
-
-  const scrollLeft = () => {
-    if (newsSliderRef.current) {
-      newsSliderRef.current.scrollBy({ left: -300, behavior: "smooth" })
+  // Fetch available stations count
+  useEffect(() => {
+    const fetchAvailableStations = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/bookings/available-count")
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableStations(data.count || 0)
+        }
+      } catch (error) {
+        console.error("Failed to fetch available stations:", error)
+      }
     }
-  }
 
-  const scrollRight = () => {
-    if (newsSliderRef.current) {
-      newsSliderRef.current.scrollBy({ left: 300, behavior: "smooth" })
-    }
-  }
+    fetchAvailableStations()
+  }, [])
+
+  const teams = [
+    { name: "Overwatch 2", image: "https://th.bing.com/th/id/OIP.pIA-RUSH0FXbYjF0W4AAbQHaEK?rs=1&pid=ImgDetMain" },
+    {
+      name: "League of Legends",
+      image:
+        "https://static0.thegamerimages.com/wordpress/wp-content/uploads/2020/02/League-of-Legends-Wallpaper-Resized.jpg",
+    },
+    { name: "Counter-Strike 2", image: "https://www.gaming.net/wp-content/uploads/2023/03/Counter-Strike-2-1.jpg" },
+    {
+      name: "Rocket League",
+      image: "https://cdn2.unrealengine.com/egs-rocketleague-psyonixllc-s3-2560x1440-56d55e752216.jpg",
+    },
+    {
+      name: "Super Smash Bros",
+      image: "https://gameluster.com/wp-content/uploads/2018/12/Super-Smash-Bros.-Ultimate-review-featured-image.jpg",
+    },
+    {
+      name: "Valorant",
+      image:
+        "https://cdn1.epicgames.com/offer/cbd5b3d310a54b12bf3fe8c41994174f/EGS_VALORANT_RiotGames_S1_2560x1440-91dc9490f14942ad5eeef278eb3ef4a6",
+    },
+    {
+      name: "Fortnite",
+      image: "https://cdn2.unrealengine.com/fortnite-og-social-1920x1080-a5adda66fab9.jpg",
+    },
+    {
+      name: "Apex Legends",
+      image:
+        "https://media.contentapi.ea.com/content/dam/apex-legends/images/2019/01/apex-featured-image-16x9.jpg.adapt.crop16x9.1023w.jpg",
+    },
+  ]
+
+  const events = [
+    {
+      title: "CVAL Regional Conference - Championship Playoffs",
+      date: "March 29, 2025 2:00 PM",
+      game: "Valorant",
+      streamLink: "https://www.twitch.tv/semoesports",
+    },
+    {
+      title: "CLoL Regional Conference - Open Playoffs",
+      date: "April 5, 2025 3:00 PM",
+      game: "League of Legends",
+      streamLink: "https://www.twitch.tv/semoesports",
+    },
+    {
+      title: "Rocket League Tournament",
+      date: "April 12, 2025 1:00 PM",
+      game: "Rocket League",
+      streamLink: "https://www.youtube.com/channel/UCsemoesports",
+    },
+    {
+      title: "CS2 Showdown",
+      date: "April 19, 2025 4:00 PM",
+      game: "Counter-Strike 2",
+      streamLink: "https://www.twitch.tv/semoesports",
+    },
+  ]
 
   return (
-    <div className="flex flex-col min-h-screen">
-      
+    <div className="bg-white text-black min-h-screen flex flex-col">
+      {/* Hero Banner with Image */}
+      <div className="relative w-full h-[80vh] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+          alt="Esports Banner"
+          className="absolute top-0 left-0 w-full h-full object-cover object-center transform scale-105 transition-transform duration-10000 animate-slow-zoom"
+        />
 
-      <main className="flex-1 pt-16">
-        {/* Hero Section with 3D */}
-        <section className="relative w-full h-[80vh] bg-gradient-to-b from-red-900 to-black overflow-hidden">
-          <div className="absolute inset-0 z-10">
-            <Canvas>
-              <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-              <ambientLight intensity={0.5} />
-              <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-              <GameController position={[0, 0, 0]} scale={[0.5, 0.5, 0.5]} rotation={[0.2, Math.PI / 4, 0]} />
-              <Environment preset="city" />
-              <OrbitControls
-                enableZoom={false}
-                enablePan={false}
-                autoRotate
-                autoRotateSpeed={3}
-                minPolarAngle={Math.PI / 2 - 0.5}
-                maxPolarAngle={Math.PI / 2 + 0.5}
-              />
-            </Canvas>
-          </div>
-          <div className="relative z-20 container mx-auto h-full flex flex-col justify-center items-start px-4 md:px-6">
-            <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
-                SEMO <span className="text-semored">Esports</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-white/90 mb-8">Compete. Connect. Conquer.</p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" 
-                className="bg-semored hover:bg-red-700 text-white" 
-                onClick={handleRegister}>
-                  Register
-                </Button>
-                <Button size="lg" variant="outline" 
-                className="bg-white text-black border-white hover:bg-gray-100" 
-                onClick={handleLogin}>
-                  Login
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-        {/* About Esports at SEMO */}
-        <section className="py-20 bg-semoblack">
-          <div className="container mx-auto px-4 md:px-4">
-            <div className="text-center mb-5">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Esports at SEMO</h2>
-              <div className="w-20 h-1 bg-semored mx-auto mt-4"></div>
-            </div>
+        {/* Enhanced gradient overlay with animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-semored/40 animate-gradient"></div>
 
-            <Tabs defaultValue="about" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8 bg-gray-800 p-2 rounded-lg">
-                <TabsTrigger value="about">About</TabsTrigger>
-                <TabsTrigger value="teams">Our Teams</TabsTrigger>
-                <TabsTrigger value="facilities">Facilities</TabsTrigger>
-              </TabsList>
-              <TabsContent value="about" className="text-white mt-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-4">
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold mb-5 gap-4 ">Building Champions</h3>
-                    <p className="mb-6">
-                      Southeast Missouri State University's Esports program offers
-                      students the opportunity to compete at the highest collegiate 
-                      level across multiple game titles. Our program focuses on developing not
-                      just gaming skills, but teamwork, communication, and leadership.
-                    </p>
-                    <p className= "mb-0">
-                      Founded in 2019, SEMO Esports has quickly grown to become one of the premier collegiate esports
-                      programs in the region, with dedicated coaching staff, state-of-the-art facilities, and a
-                      supportive community.
-                    </p>
-                  </div>
-                  <div className="rounded-lg overflow-hidden">
-                    <img
-                      src="/placeholder.svg?height=400&width=600"
-                      alt="SEMO Esports Team"
-                      className="w-full h-auto object-cover"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="teams" className="text-white">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {[
-                    "League of Legends",
-                    "Valorant",
-                    "Rocket League",
-                    "Overwatch",
-                    "Call of Duty",
-                    "Super Smash Bros",
-                  ].map((game) => (
-                    <Card key={game} className="bg-gray-900 border-semored hover:border-red-800 transition-colors">
-                      <CardContent className="p-6">
-                        <h3 className="text-xl font-bold mb-2">{game}</h3>
-                        <p className="text-zinc-300">
-                          Our {game} team competes in collegiate tournaments and leagues throughout the academic year.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="facilities" className="text-white">
-                <div className="grid md:grid-cols-2 gap-8 items-center">
-                  <div className="rounded-lg overflow-hidden">
-                    <img
-                      src="/placeholder.svg?height=400&width=600"
-                      alt="SEMO Esports Facility"
-                      className="w-full h-auto object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold mb-4">State-of-the-Art Arena</h3>
-                    <p className="mb-4">
-                      Our dedicated esports arena features high-performance gaming PCs, professional peripherals, and a
-                      broadcast station for streaming matches and creating content.
-                    </p>
-                    <p>
-                      The facility is designed to provide the optimal environment for practice, competition, and team
-                      development, with dedicated spaces for each of our competitive teams.
-                    </p>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </section>
-        {/* News and Updates */}
-        <section className="py-16 bg-black">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">News & Updates</h2>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={scrollLeft}
-                  className="text-white border-white hover:bg-white/10"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={scrollRight}
-                  className="text-white border-white hover:bg-white/10"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div
-              ref={newsSliderRef}
-              className="flex gap-6 overflow-x-auto pb-6 snap-x scrollbar-hide"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        {/* Content - Left aligned with animations */}
+        <div className="absolute inset-0 flex flex-col justify-center z-10 px-8 md:px-16 lg:px-24">
+          <div className="max-w-2xl animate-fade-in-up">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-left text-white">
+              WELCOME TO <span className="text-semored">SEMO ESPORTS</span>
+            </h1>
+            <p
+              className="text-xl md:text-2xl text-left text-gray-100 mb-8 opacity-0 animate-fade-in"
+              style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}
             >
-              {[
-                {
-                  title: "SEMO Valorant Team Advances to Nationals",
-                  date: "March 5, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                },
-                {
-                  title: "New Gaming PCs Installed in Arena",
-                  date: "February 28, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                },
-                {
-                  title: "Spring Tryouts Announced",
-                  date: "February 15, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                },
-                {
-                  title: "SEMO Hosts Regional Tournament",
-                  date: "January 30, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                },
-                {
-                  title: "Rocket League Team Secures Sponsorship",
-                  date: "January 22, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                },
-              ].map((news, index) => (
-                <div key={index} className="min-w-[300px] md:min-w-[400px] snap-start">
-                  <Card className="bg-gray-900 border-semored overflow-hidden h-full hover:border-red-700 transition-colors">
-                    <div className="h-48 overflow-hidden">
-                      <img
-                        src={news.image || "/placeholder.svg"}
-                        alt={news.title}
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                    <CardContent className="p-6">
-                      <p className="text-sm text-semored mb-2">{news.date}</p>
-                      <h3 className="text-xl font-bold text-white mb-2">{news.title}</h3>
-                      <a href="#" className="text-semored hover:text-red-300 text-sm font-medium">
-                        Read More →
-                      </a>
-                    </CardContent>
-                  </Card>
+              Compete. Connect. Conquer.
+            </p>
+            <div
+              className="flex flex-wrap gap-4 opacity-0 animate-fade-in"
+              style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}
+            >
+              <Link
+                to="/register"
+                className="bg-semored hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md transition-all transform hover:scale-105 hover:shadow-lg"
+              >
+                Join Our Team
+              </Link>
+              <Link
+                to="/club-registration"
+                className="bg-transparent hover:bg-white/20 text-white border-2 border-white font-bold py-3 px-6 rounded-md transition-all transform hover:scale-105 hover:shadow-lg"
+              >
+                Register for Club
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main className="flex-1">
+        <section className="w-full max-w-7xl mx-auto px-4">
+          {/* Featured Teams */}
+          <div className="mt-10 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">View our team roster</h2>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              Representing SEMO in competitive gaming across multiple titles
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {teams.map((team, index) => (
+                <div
+                  key={index}
+                  className="bg-white border shadow-md rounded-lg overflow-hidden 
+                            transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(200,16,46,0.3)]"
+                >
+                  <div className="w-full h-48 overflow-hidden">
+                    <img
+                      src={team.image || "/placeholder.svg"}
+                      alt={team.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{team.name}</h3>
+                    <Link
+                      to={`/teams/${team.name.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="mt-2 inline-block text-semored hover:underline text-sm"
+                    >
+                      View Team →
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
-           
           </div>
-         
-        </section>
-        
-      </main>
 
-      
+          {/* Book a Station */}
+          <div className="mt-20 bg-gray-900 text-white rounded-xl overflow-hidden">
+            <div className="grid md:grid-cols-2">
+              <div className="p-8 md:p-12 flex flex-col justify-center">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Book a Gaming Station</h2>
+                <p className="text-gray-300 mb-6">
+                  Reserve your spot at our state-of-the-art gaming facility. Practice with your team or enjoy some solo
+                  gaming time.
+                </p>
+                <div className="flex items-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-semored flex items-center justify-center mr-4">
+                    <span className="text-2xl font-bold">{availableStations}</span>
+                  </div>
+                  <p>Stations currently available</p>
+                </div>
+                <Link
+                  to="/login"
+                  className="bg-semored hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md inline-block transition-all transform hover:scale-105 w-fit"
+                >
+                  Book Now
+                </Link>
+              </div>
+              <div className="hidden md:block">
+                <img
+                  src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                  alt="Gaming Station"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming Events */}
+          <div className="mt-20">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold">Upcoming Events</h2>
+              <Link to="/events" className="text-semored hover:underline text-sm">
+                View All Events →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {events.map((event, index) => (
+                <div
+                  key={index}
+                  className="bg-white border shadow-md rounded-lg p-6 flex flex-col
+                            transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(200,16,46,0.3)]"
+                >
+                  <div className="flex items-center text-semored mb-3">
+                    <Calendar className="w-5 h-5 mr-2" />
+                    <span className="text-sm font-medium">{event.date}</span>
+                  </div>
+
+                  <h3 className="text-lg font-semibold mb-3">{event.title}</h3>
+
+                  <div className="flex items-center mb-4">
+                    <Gamepad2 className="w-4 h-4 mr-2 text-gray-500" />
+                    <span className="text-sm text-gray-600">{event.game}</span>
+                  </div>
+
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <a
+                      href={event.streamLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-semored hover:underline"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      <span className="text-sm">Watch Live</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Latest News */}
+          <div className="mt-20 mb-20">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold">Latest News</h2>
+              <Link to="/news" className="text-semored hover:underline text-sm">
+                See All News →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* News Card 1 */}
+              <div
+                className="bg-white border shadow-md rounded-lg overflow-hidden
+                            transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(200,16,46,0.3)]"
+              >
+                <div className="p-6">
+                  <div className="flex items-center text-gray-500 mb-2">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span className="text-sm">March 15, 2025</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">NC State to host 2025 CLoL & CVAL Championship Finals!</h3>
+                  <p className="text-gray-600 mb-4">
+                    In collaboration with Visit Raleigh, NC State University, ExitLag, and Riot Games
+                  </p>
+                  <Link to="/news/1" className="text-semored hover:underline">
+                    Read More →
+                  </Link>
+                </div>
+              </div>
+
+              {/* News Card 2 */}
+              <div
+                className="bg-white border shadow-md rounded-lg overflow-hidden
+                            transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(200,16,46,0.3)]"
+              >
+                <div className="p-6">
+                  <div className="flex items-center text-gray-500 mb-2">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span className="text-sm">March 10, 2025</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">2025 UENA Co-streaming & Broadcast Partner Program</h3>
+                  <p className="text-gray-600 mb-4">
+                    We are looking for partners to work with for broadcast coverage this season.
+                  </p>
+                  <Link to="/news/2" className="text-semored hover:underline">
+                    Read More →
+                  </Link>
+                </div>
+              </div>
+
+              {/* News Card 3 */}
+              <div
+                className="bg-white border shadow-md rounded-lg overflow-hidden
+                            transition-transform duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(200,16,46,0.3)]"
+              >
+                <div className="p-6">
+                  <div className="flex items-center text-gray-500 mb-2">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span className="text-sm">March 5, 2025</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    2025 College League of Legends and Valorant Season Has Begun
+                  </h3>
+                  <p className="text-gray-600 mb-4">Get ready for the 2025 season of College LoL & College Valorant.</p>
+                  <Link to="/news/3" className="text-semored hover:underline">
+                    Read More →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
 
-function GameController(props) {
-  return (  
-    <group {...props} rotation={[-Math.PI / 6, 0, 0]}>
-      {/* Main controller body */}
-      <mesh castShadow receiveShadow position={[0, 0, 0]}>
-        <boxGeometry args={[3.2, 0.6, 2.2]} />
-        <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.6} />
-      </mesh>
+export default LandingPage
 
-      {/* Left grip */}
-      <mesh castShadow receiveShadow position={[-1.3, -0.2, 0.5]} rotation={[0, 0, 0.2]}>
-        <cylinderGeometry args={[0.6, 0.8, 1.6, 32]} />
-        <meshStandardMaterial color="#222222" />
-      </mesh>
-
-      {/* Right grip */}
-      <mesh castShadow receiveShadow position={[1.3, -0.2, 0.5]} rotation={[0, 0, -0.2]}>
-        <cylinderGeometry args={[0.6, 0.8, 1.6, 32]} />
-        <meshStandardMaterial color="#222222" />
-      </mesh>
-
-      {/* D-pad */}
-      <mesh castShadow receiveShadow position={[-1, 0.4, -0.7]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.1, 32]} rotation={[Math.PI / 2, 0, 0]} />
-        <meshStandardMaterial color="#333333" />
-      </mesh>
-
-      {/* Left analog stick */}
-      <mesh castShadow receiveShadow position={[-0.6, 0.4, 0.4]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.1, 32]} rotation={[Math.PI / 2, 0, 0]} />
-        <meshStandardMaterial color="#444444" />
-      </mesh>
-      <mesh castShadow receiveShadow position={[-0.6, 0.5, 0.4]}>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshStandardMaterial color="#cc0000" />
-      </mesh>
-
-      {/* Right analog stick */}
-      <mesh castShadow receiveShadow position={[0.6, 0.4, -0.4]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.1, 32]} rotation={[Math.PI / 2, 0, 0]} />
-        <meshStandardMaterial color="#444444" />
-      </mesh>
-      <mesh castShadow receiveShadow position={[0.6, 0.5, -0.4]}>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshStandardMaterial color="#cc0000" />
-      </mesh>
-
-      {/* Action buttons */}
-      {[{ x: 1.2, y: -0.6 }, { x: 1.5, y: -0.4 }, { x: 1.2, y: -0.2 }, { x: 0.9, y: -0.4 }].map(
-        (pos, index) => (
-          <mesh key={index} castShadow receiveShadow position={[pos.x, 0.4, pos.y]}>
-            <cylinderGeometry args={[0.18, 0.18, 0.1, 32]} rotation={[Math.PI / 2, 0, 0]} />
-            <meshStandardMaterial color={["#cc0000", "#aa0000", "#880000", "#dd0000"][index]} />
-          </mesh>
-        )
-      )}
-
-      {/* Center logo button */}
-      <mesh castShadow receiveShadow position={[0, 0.45, 0]}>
-        <cylinderGeometry args={[0.5, 0.5, 0.12, 32]} rotation={[Math.PI / 2, 0, 0]} />
-        <meshStandardMaterial color="#cc0000" metalness={0.6} roughness={0.3} />
-      </mesh>
-    </group>
-  );
-}
-
- 
+export const style = `
+  @keyframes slow-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+  }
+  
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes gradient-shift {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.8; }
+  }
+  
+  .animate-slow-zoom {
+    animation: slow-zoom 15s ease-in-out infinite alternate;
+  }
+  
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.8s ease-out forwards;
+  }
+  
+  .animate-gradient {
+    animation: gradient-shift 5s ease-in-out infinite;
+  }
+`
 

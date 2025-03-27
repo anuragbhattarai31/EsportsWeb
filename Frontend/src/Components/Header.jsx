@@ -1,66 +1,43 @@
+"use client"
+
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import { ChevronDown, Menu, X } from "lucide-react"
 
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [username, setUsername] = useState("")
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen)
-  }
-
-  const handleMouseEnter = () => {
-    setIsDropdownOpen(true)
-  }
-
-  const handleMouseLeave = () => {
-    setTimeout(() => {
-      setIsDropdownOpen(false)
-    }, 200)
-  }
-
-  const handleUserMouseEnter = () => {
-    setIsUserDropdownOpen(true)
-  }
-
-  const handleUserMouseLeave = () => {
-    setIsUserDropdownOpen(false)
-  }
+  const [isGamesOpen, setIsGamesOpen] = useState(false)
+  const [isTeamsOpen, setIsTeamsOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
     localStorage.removeItem("token")
+    // Redirect to login
     window.location.href = "/login"
   }
 
   useEffect(() => {
-    // Update the fetchUserDetails function
-    const fetchUserDetails = async () => {
-      const token = localStorage.getItem("token")
-      if (!token) return
+    // Attempt to fetch user details if token exists
+    const token = localStorage.getItem("token")
+    if (!token) return
 
+    const fetchUserDetails = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/auth/user", {
           headers: { Authorization: `Bearer ${token}` },
         })
-
         if (!response.ok) {
-          // Handle 401 Unauthorized (invalid token)
+          // If token is invalid (401, etc.), remove and reload
           if (response.status === 401) {
             localStorage.removeItem("token")
             window.location.reload()
           }
-          throw new Error(`HTTP error! status: ${response.status}`)
+          return
         }
-
         const data = await response.json()
         setUsername(data.username)
-      } catch (error) {
-        console.error("Error fetching user details:", error)
-        // Handle JSON parse errors
-        if (error instanceof SyntaxError) {
-          console.error("Invalid JSON response from server")
-        }
+      } catch (err) {
+        console.error("Error fetching user details:", err)
       }
     }
 
@@ -68,91 +45,185 @@ const Header = () => {
   }, [])
 
   return (
-    <header className="w-full bg-semoblack text-white py-3 px-4 fixed top-0 z-50">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <div
-          className="font-bold text-center mb-1 relative cursor-pointer"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+    <header className="fixed top-0 left-0 w-full bg-semoblack/90 backdrop-blur-sm text-white z-50 shadow-md transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+        {/* Brand: clicking goes to landing page ("/") */}
+        <Link
+          to="/"
+          className="flex items-center space-x-1 transition-all duration-300 hover:scale-105 hover:text-semored"
         >
-          <div className="text-semored text-2xl">SE</div>
-          <div className="text-white text-xl">MO</div>
+          <div className="text-semored text-2xl font-bold leading-5 transition-all duration-300">SE</div>
+          <div className="text-white text-2xl font-bold leading-5 transition-all duration-300">MO</div>
+          <span className="text-sm ml-2 text-gray-300 hidden sm:inline-block transition-all duration-300">Esports</span>
+        </Link>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-white focus:outline-none"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex space-x-6 text-sm font-medium">
+          {/* GAMES Dropdown */}
           <div
-            className={`absolute top-full left-0 min-w-[700px] bg-semoblack text-white p-6 rounded-lg shadow-lg transition-transform duration-150 ease-out transform origin-top ${isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            className="relative"
+            onMouseEnter={() => setIsGamesOpen(true)}
+            onMouseLeave={() => setIsGamesOpen(false)}
           >
-            <div className="grid grid-cols-3 gap-10">
-              <div>
-                <h3 className="font-bold text-lg text-gray-300 pb-4 border-b border-gray-600">Games</h3>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Valorant
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Rocket League
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  CSGO
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Rainbow Six Siege
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  League of Legends
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Genshin Impact
-                </a>
-              </div>
-              <div>
-                <h3 className=" text-lg text-gray-300 pb-4 border-b border-gray-600">Teams</h3>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Apply to the Team
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Tournament Standings
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Teams
-                </a>
-              </div>
-              <div>
-                <h3 className=" text-lg text-gray-300 pb-4 border-b border-gray-600">Others</h3>
-                <a href="#" className="block py-2 hover:text-semored">
-                  News
-                </a>
-                <a href="#" className="block py-2 hover:text-semored">
-                  Contact Us
-                </a>
-              </div>
+            <span className="cursor-pointer hover:text-semored transition-colors flex items-center">
+              Games
+              <ChevronDown className="ml-1 h-4 w-4" />
+            </span>
+            <div
+              className={`
+                absolute top-full left-0 mt-2 w-44 bg-semoblack/95 backdrop-blur-sm border border-gray-700 rounded shadow-lg py-2
+                transition-all duration-300 transform origin-top
+                ${isGamesOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
+              `}
+            >
+              <Link
+                to="/games/valorant"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Valorant
+              </Link>
+              <Link
+                to="/games/rocket-league"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Rocket League
+              </Link>
+              <Link
+                to="/games/league-of-legends"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                League of Legends
+              </Link>
+              <Link
+                to="/games/csgo"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Counter-Strike 2
+              </Link>
             </div>
           </div>
-        </div>
-        <div className="relative" onMouseEnter={handleUserMouseEnter} onMouseLeave={handleUserMouseLeave}>
-          <div className="cursor-pointer">{username || "Guest"}</div>
+
+          {/* TEAMS Dropdown */}
           <div
-            className={`absolute top-full right-0 min-w-[150px] bg-semoblack text-white p-4 rounded-lg shadow-lg transition-transform duration-150 easeout transform origin-top ${isUserDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
+            className="relative"
+            onMouseEnter={() => setIsTeamsOpen(true)}
+            onMouseLeave={() => setIsTeamsOpen(false)}
           >
-            <a href="#" className="block py-2 hover:text-semored">
-              Profile
-            </a>
-            <a href="#" className="block py-2 hover:text-red-500" onClick={handleLogout}>
-              Logout
-            </a>
-          </div>
-        </div>
-        <div className="md:hidden">
-          <button onClick={toggleMenu} className="focus:outline-none">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+            <span className="cursor-pointer hover:text-semored transition-colors flex items-center">
+              Teams
+              <ChevronDown className="ml-1 h-4 w-4" />
+            </span>
+            <div
+              className={`
+                absolute top-full left-0 mt-2 w-44 bg-semoblack/95 backdrop-blur-sm border border-gray-700 rounded shadow-lg py-2
+                transition-all duration-300 transform origin-top
+                ${isTeamsOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
+              `}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
-          </button>
+              <Link
+                to="/teams/apply"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Apply
+              </Link>
+              <Link
+                to="/teams/standings"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Standings
+              </Link>
+              <Link
+                to="/teams/tournaments"
+                className="block px-4 py-2 text-sm hover:text-semored hover:bg-gray-800 transition-colors"
+              >
+                Tournaments
+              </Link>
+            </div>
+          </div>
+
+          <Link
+            to="/news"
+            className="hover:text-semored transition-all duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-semored hover:after:w-full after:transition-all after:duration-300"
+          >
+            News
+          </Link>
+
+          <Link
+            to="/events"
+            className="hover:text-semored transition-all duration-300 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-semored hover:after:w-full after:transition-all after:duration-300"
+          >
+            Events
+          </Link>
+        </nav>
+
+        {/* Right Side */}
+        <div className="hidden md:block text-sm font-medium">
+          {username ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-200">Hello, {username}</span>
+              <button onClick={handleLogout} className="hover:text-semored focus:outline-none transition-colors">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link to="/login" className="hover:text-semored focus:outline-none transition-colors">
+                Login
+              </Link>
+              <Link to="/register" className="bg-semored hover:bg-red-700 px-4 py-2 rounded-md transition-colors">
+                Register
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden bg-semoblack/95 backdrop-blur-sm border-t border-gray-800 
+        transition-all duration-300 transform ${isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}
+      >
+        <div className="px-4 py-3 space-y-3">
+          <Link to="/games" className="block py-2 hover:text-semored">
+            Games
+          </Link>
+          <Link to="/teams" className="block py-2 hover:text-semored">
+            Teams
+          </Link>
+          <Link to="/news" className="block py-2 hover:text-semored">
+            News
+          </Link>
+          <Link to="/events" className="block py-2 hover:text-semored">
+            Events
+          </Link>
+
+          <div className="pt-3 border-t border-gray-800">
+            {username ? (
+              <>
+                <span className="block py-2 text-gray-400">Hello, {username}</span>
+                <button onClick={handleLogout} className="block py-2 w-full text-left hover:text-semored">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="block py-2 hover:text-semored">
+                  Login
+                </Link>
+                <Link to="/register" className="block py-2 hover:text-semored">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>

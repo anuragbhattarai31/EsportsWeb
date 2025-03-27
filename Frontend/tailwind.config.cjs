@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", "*.{js,ts,jsx,tsx,mdx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     container: {
       center: true,
@@ -11,19 +14,25 @@ export default {
     },
     extend: {
       colors: {
+        // If you prefer a purely custom approach for primary/secondary:
+        primary: {
+          DEFAULT: "#C8102E",    // semored
+          foreground: "#FFFFFF", // or pick any text color that’s visible on red
+        },
+        secondary: {
+          DEFAULT: "#000000",    // semoblack
+          foreground: "#FFFFFF", // or your chosen text color
+        },
+        // If you still want direct references:
+        semored: "#C8102E",
+        semoblack: "#000000",
+
+        // The rest from your HSL-based theming:
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -44,8 +53,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        semored: "#cc0000",
-        semoblack: "#111111",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -61,10 +68,17 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        // Add more custom keyframes (fadeIn, etc.) if you want
+        fadeIn: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        // Your fadeIn for example
+        fadeIn: "fadeIn 0.3s ease-in forwards",
       },
       borderWidth: {
         3: "3px",
@@ -73,4 +87,3 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 }
-
