@@ -9,13 +9,13 @@ import Header from './Components/Header';
 import LandingPage from './Pages/landingpage';
 import ClubRegistration from './Pages/ClubRegistration';
 import './index.css';
+import TeamDetailsPage from './Pages/TeamDetailsPage';
 
 
 const App = () => {
   return (
     <Router>
        <div className="min-h-screen flex flex-col">
-        <Header/>
        <main className="flex-grow">
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -23,11 +23,11 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/adminDashboard" element = {<AdminDashboard/>} />
             <Route path="/club-registration" element={<ClubRegistration />} />
+            <Route path="/teams/:id" element={<TeamDetailsPage/>}/>
             <Route path="/" element={< LandingPage/>} /> {/* Default route */}
           
         </Routes>
         </main>
-        <Footer/>
       </div>
     </Router>
   );

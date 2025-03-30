@@ -74,7 +74,7 @@ const getStats = async (req, res) => {
     const usersResult = await pool.query('SELECT COUNT(*) FROM users');
     const totalUsers = parseInt(usersResult.rows[0].count);
 
-    // Active Reservations (adjust based on your booking status logic)
+    // Active Reservations 
     const activeBookingsResult = await pool.query(
       `SELECT COUNT(*) FROM bookings
        WHERE status = $1
@@ -83,7 +83,7 @@ const getStats = async (req, res) => {
     );
     const activeReservations = parseInt(activeBookingsResult.rows[0].count);
 
-    // Pending Requests (example: bookings awaiting approval)
+    // Pending Requests 
     const pendingRequestsResult = await pool.query(
       'SELECT COUNT(*) FROM bookings WHERE status = $1',
       ['pending']
@@ -160,5 +160,5 @@ module.exports = {
   getStats,          // Added
   toggleDevice,
   updateDevice,
-  deleteDevice       // Added
+  deleteDevice      
 };

@@ -29,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/club-registrations', clubRegistrationRoutes);
+app.use('/api/teams', require('./routes/teamRoutes'));
 
 // Test Database Connection
 pool.connect()
