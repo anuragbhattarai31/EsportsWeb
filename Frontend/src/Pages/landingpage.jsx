@@ -1,8 +1,7 @@
-"use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, Suspense } from "react"
 import { Canvas } from "@react-three/fiber"
-import { OrbitControls, PerspectiveCamera, Environment, Stars } from "@react-three/drei"
+import { OrbitControls, PerspectiveCamera, Environment, Stars, useGLTF } from "@react-three/drei"
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent } from "@/Components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
@@ -11,6 +10,7 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -91,20 +91,19 @@ export default function LandingPage() {
           {/* 3D Canvas */}
           <div className="absolute inset-0 z-10">
             <Canvas>
-              <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-              <ambientLight intensity={0.5} />
-              <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-              <GamingSetup position={[0, -1, 0]} scale={[0.6, 0.6, 0.6]} rotation={[0, Math.PI / 4, 0]} />
+              <PerspectiveCamera makeDefault position={[-1, -0.5, 2]} />
+              <ambientLight intensity={0.7} />
+              <spotLight position={[11, 11, 11]} angle={0.4} penumbra={1} intensity={1} castShadow />
+              <Suspense fallback={<LoadingModel />}>
+                <GLBModel
+                  path="/models/xbox controller.glb"
+                  position={[-0.85, -0.75, -1.5]}
+                  scale={[2, 2, 2]}
+                  rotation={[0.3, 0.5, 0.5]}
+                />
+              </Suspense>
               <Environment preset="night" />
               <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-              <OrbitControls
-                enableZoom={false}
-                enablePan={false}
-                autoRotate
-                autoRotateSpeed={1.5}
-                minPolarAngle={Math.PI / 2 - 0.5}
-                maxPolarAngle={Math.PI / 2 + 0.5}
-              />
             </Canvas>
           </div>
 
@@ -220,7 +219,7 @@ export default function LandingPage() {
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-xl shadow-semored/10 border border-gray-700/30 transform hover:scale-105 transition-transform duration-300">
                     <img
-                      src="/placeholder.svg?height=400&width=600"
+                      src="/public/images/esports-banner.jpg?height=400&width=600"
                       alt="SEMO Esports Team"
                       className="w-full h-auto object-cover"
                     />
@@ -262,9 +261,9 @@ export default function LandingPage() {
 
               <TabsContent value="facilities" className="text-white">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
-                  <div className="rounded-lg overflow-hidden shadow-xl shadow-semored/10 border border-gray-700/30 order-2 md:order-1">
+                  <div className="rounded-lg overflow-hidden shadow-xl shadow-semored/10 border border-gray-700/30 transform hover:scale-105 transition-transform duration-300">
                     <img
-                      src="/placeholder.svg?height=400&width=600"
+                      src="/public/images/Esports2.jpg?height=400&width=600"
                       alt="SEMO Esports Facility"
                       className="w-full h-auto object-cover"
                     />
@@ -325,7 +324,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="icon"
                   onClick={() => scrollLeft(eventsSliderRef)}
-                  className="text-white border-white/20 hover:bg-white/10"
+                  className="text-gray border-white/20 hover:bg-white/10"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -493,17 +492,17 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* Game Booking Section */}
         <section className="py-20 bg-gradient-to-r from-semoblack to-dark-300 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/hexagon-pattern.png')] bg-repeat opacity-5"></div>
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-white font-gaming mb-6">
-                JOIN THE <span className="text-semored">TEAM</span>
+                BOOK YOUR <span className="text-semored">GAMING SESSION</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8">
-                Ready to take your gaming to the next level? Join SEMO Esports and become part of our growing community
-                of competitive gamers.
+                Reserve your spot at our state-of-the-art gaming facility. Access high-end equipment and join the SEMO
+                Esports community.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -512,14 +511,14 @@ export default function LandingPage() {
                   className="text-lg py-6 px-8 font-gaming button-glow"
                   onClick={handleRegister}
                 >
-                  REGISTER NOW
+                  BOOK NOW
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   className="text-white bg-gray-700 hover:bg-gray-500 py-6 px-8 font-gaming border-gray-700 hover:border-gray-500"
                   onClick={() => navigate("/club-registration")}
-              >
+                >
                   LEARN MORE
                 </Button>
               </div>
@@ -532,201 +531,49 @@ export default function LandingPage() {
   )
 }
 
-function GamingSetup(props) {
+// GLB Model Component
+function GLBModel({ path, ...props }) {
   const [hovered, setHovered] = useState(false)
-  const [rgbPhase, setRgbPhase] = useState(0)
+  const [floatY, setFloatY] = useState(0)
+  const { scene } = useGLTF(path)
+  const groupRef = useRef()
 
-  // RGB color cycling effect
+  // Gentle floating animation
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRgbPhase((prev) => (prev + 0.01) % 1)
-    }, 50)
-    return () => clearInterval(interval)
+    let animFrame
+    const animate = () => {
+      setFloatY((prev) => Math.sin(Date.now() * 0.0008) * 0.05)
+      animFrame = requestAnimationFrame(animate)
+    }
+    animate()
+    return () => cancelAnimationFrame(animFrame)
   }, [])
 
-  // Calculate RGB colors based on phase
-  const getRgbColor = (offset = 0) => {
-    const r = Math.sin(2 * Math.PI * (rgbPhase + offset)) * 0.5 + 0.5
-    const g = Math.sin(2 * Math.PI * (rgbPhase + offset + 0.33)) * 0.5 + 0.5
-    const b = Math.sin(2 * Math.PI * (rgbPhase + offset + 0.66)) * 0.5 + 0.5
-    return `rgb(${Math.floor(r * 255)}, ${Math.floor(g * 255)}, ${Math.floor(b * 255)})`
+
+
+  const groupProps = {
+    ...props,
+    position: [props.position[0], props.position[1] + floatY, props.position[2]],
+    onPointerOver: () => setHovered(true),
+    onPointerOut: () => setHovered(false),
+    scale: hovered ? props.scale.map((s) => s * 1.05) : props.scale,
+    ref: groupRef,
   }
 
   return (
-    <group
-      {...props}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-      scale={hovered ? props.scale.map((s) => s * 1.05) : props.scale}
-    >
-      {/* Gaming Desk */}
-      <mesh castShadow receiveShadow position={[0, -0.5, 0]}>
-        <boxGeometry args={[5, 0.1, 2.5]} />
-        <meshStandardMaterial color="#222222" metalness={0.4} roughness={0.6} />
-      </mesh>
-
-      {/* Monitor Stand */}
-      <mesh castShadow receiveShadow position={[0, -0.2, -0.8]}>
-        <boxGeometry args={[0.6, 0.6, 0.3]} />
-        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Main Monitor */}
-      <mesh castShadow receiveShadow position={[0, 0.4, -0.9]}>
-        <boxGeometry args={[3, 1.7, 0.1]} />
-        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Monitor Screen */}
-      <mesh castShadow receiveShadow position={[0, 0.4, -0.85]}>
-        <boxGeometry args={[2.8, 1.5, 0.05]} />
-        <meshStandardMaterial
-          color="#000000"
-          emissive="#0066cc"
-          emissiveIntensity={0.5}
-          metalness={0.9}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Secondary Monitor (Left) */}
-      <mesh castShadow receiveShadow position={[-1.8, 0.2, -0.7]} rotation={[0, Math.PI / 8, 0]}>
-        <boxGeometry args={[1.5, 1.3, 0.1]} />
-        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Secondary Monitor Screen */}
-      <mesh castShadow receiveShadow position={[-1.8, 0.2, -0.65]} rotation={[0, Math.PI / 8, 0]}>
-        <boxGeometry args={[1.3, 1.1, 0.05]} />
-        <meshStandardMaterial
-          color="#000000"
-          emissive="#cc0066"
-          emissiveIntensity={0.5}
-          metalness={0.9}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Secondary Monitor (Right) */}
-      <mesh castShadow receiveShadow position={[1.8, 0.2, -0.7]} rotation={[0, -Math.PI / 8, 0]}>
-        <boxGeometry args={[1.5, 1.3, 0.1]} />
-        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Secondary Monitor Screen */}
-      <mesh castShadow receiveShadow position={[1.8, 0.2, -0.65]} rotation={[0, -Math.PI / 8, 0]}>
-        <boxGeometry args={[1.3, 1.1, 0.05]} />
-        <meshStandardMaterial
-          color="#000000"
-          emissive="#00cc66"
-          emissiveIntensity={0.5}
-          metalness={0.9}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Keyboard */}
-      <mesh castShadow receiveShadow position={[0, -0.4, 0.3]}>
-        <boxGeometry args={[2, 0.1, 0.8]} />
-        <meshStandardMaterial
-          color="#222222"
-          emissive={getRgbColor()}
-          emissiveIntensity={0.5}
-          metalness={0.7}
-          roughness={0.3}
-        />
-      </mesh>
-
-      {/* Mouse */}
-      <mesh castShadow receiveShadow position={[1.2, -0.4, 0.3]}>
-        <capsuleGeometry args={[0.15, 0.3, 4, 8]} rotation={[Math.PI / 2, 0, 0]} />
-        <meshStandardMaterial
-          color="#222222"
-          emissive={getRgbColor(0.2)}
-          emissiveIntensity={0.5}
-          metalness={0.7}
-          roughness={0.3}
-        />
-      </mesh>
-
-      {/* Mousepad */}
-      <mesh castShadow receiveShadow position={[1.2, -0.44, 0.3]}>
-        <cylinderGeometry args={[0.6, 0.6, 0.02, 32]} />
-        <meshStandardMaterial color="#111111" metalness={0.3} roughness={0.8} />
-      </mesh>
-
-      {/* Headset */}
-      <mesh castShadow receiveShadow position={[-1.2, -0.3, 0.3]}>
-        <torusGeometry args={[0.3, 0.05, 16, 32, Math.PI]} />
-        <meshStandardMaterial
-          color="#222222"
-          emissive={getRgbColor(0.4)}
-          emissiveIntensity={0.5}
-          metalness={0.7}
-          roughness={0.3}
-        />
-      </mesh>
-
-      {/* Headset Stand */}
-      <mesh castShadow receiveShadow position={[-1.2, -0.4, 0.3]}>
-        <cylinderGeometry args={[0.1, 0.15, 0.1, 16]} />
-        <meshStandardMaterial color="#111111" metalness={0.5} roughness={0.5} />
-      </mesh>
-
-      {/* Gaming Chair (Back) */}
-      <mesh castShadow receiveShadow position={[0, -0.2, 1.5]}>
-        <boxGeometry args={[1.2, 1.4, 0.2]} />
-        <meshStandardMaterial
-          color="#111111"
-          emissive="#E6323E"
-          emissiveIntensity={0.2}
-          metalness={0.5}
-          roughness={0.5}
-        />
-      </mesh>
-
-      {/* Gaming Chair (Seat) */}
-      <mesh castShadow receiveShadow position={[0, -0.7, 1.2]}>
-        <boxGeometry args={[1.2, 0.1, 0.8]} />
-        <meshStandardMaterial
-          color="#111111"
-          emissive="#E6323E"
-          emissiveIntensity={0.2}
-          metalness={0.5}
-          roughness={0.5}
-        />
-      </mesh>
-
-      {/* RGB Light Strip (Behind Desk) */}
-      <mesh castShadow receiveShadow position={[0, -0.45, -1.2]}>
-        <boxGeometry args={[4.8, 0.05, 0.05]} />
-        <meshStandardMaterial
-          color="#111111"
-          emissive={getRgbColor(0.6)}
-          emissiveIntensity={1}
-          metalness={0.5}
-          roughness={0.5}
-        />
-      </mesh>
-
-      {/* Trophy */}
-      <group position={[-2, -0.3, 0.3]}>
-        <mesh castShadow receiveShadow position={[0, 0, 0]}>
-          <cylinderGeometry args={[0.1, 0.15, 0.05, 16]} />
-          <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh castShadow receiveShadow position={[0, 0.15, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.3, 16]} />
-          <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh castShadow receiveShadow position={[0, 0.3, 0]}>
-          <sphereGeometry args={[0.15, 16, 16]} />
-          <meshStandardMaterial color="#FFD700" metalness={0.8} roughness={0.2} />
-        </mesh>
-      </group>
-
-
+    <group {...groupProps}>
+      <primitive object={scene.clone()} />
     </group>
+  )
+}
+
+// Loading placeholder while the model loads
+function LoadingModel() {
+  return (
+    <mesh position={[0, 0, 0]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#E6323E" wireframe />
+    </mesh>
   )
 }
 
