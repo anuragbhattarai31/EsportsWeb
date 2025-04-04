@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
 @font-face {
   font-family: "Industry";
@@ -34,7 +35,7 @@
 }
 
 body {
-  font-family: "Rajdhani", sans-serif;
+  font-family: "Poppins", sans-serif;
   @apply bg-semoblack text-white;
   background-image: linear-gradient(to bottom, #0f1319, #151921);
 }
@@ -79,6 +80,7 @@ body {
   animation: glitch-anim-2 5s infinite linear alternate-reverse;
 }
 
+/* Animations for glitch */
 @keyframes glitch-anim-1 {
   0% {
     clip: rect(7px, 9999px, 94px, 0);
@@ -211,7 +213,7 @@ body {
   }
 }
 
-/* Custom scroll bar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -230,7 +232,7 @@ body {
   background: #ff3a47;
 }
 
-/* For Firefox */
+/* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: #e6323e #0f1319;
@@ -245,6 +247,7 @@ body {
   display: none;
 }
 
+/* Glow Animation */
 .animate-glow {
   animation: glow 2s ease-in-out infinite alternate;
 }
@@ -258,15 +261,29 @@ body {
   }
 }
 
+/* 🔥 USE THIS ON YOUR LOGIN BUTTON */
 .button-glow {
   box-shadow: 0 0 10px rgba(230, 50, 62, 0.6);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
 .button-glow:hover {
-  box-shadow: 0 0 15px rgba(230, 50, 62, 0.8), 0 0 30px rgba(230, 50, 62, 0.6);
+  box-shadow: 0 0 20px rgba(230, 50, 62, 0.9), 0 0 40px rgba(230, 50, 62, 0.6);
+  transform: scale(1.05);
 }
 
+/* Optional: white glow variant */
+.button-glow-white {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.button-glow-white:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+/* Brutalism, Gradient Borders (unchanged) */
 .neo-brutalism {
   box-shadow: 5px 5px 0px 0px rgba(230, 50, 62, 1);
   transition: all 0.2s ease;
