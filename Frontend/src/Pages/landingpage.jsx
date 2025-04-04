@@ -134,7 +134,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-white bg-gray-700 hover:bg-gray-500 py-6 px-8 font-gaming border-gray-700 hover:border-gray-500"
+                  className="text-white bg-gray-700 hover:bg-gray-500 py-6 px-8 font-gaming border-gray-700 hover:border-gray-500 button-glow"
                   onClick={handleLogin}
                 >
                   LOGIN
