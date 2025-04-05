@@ -1,0 +1,13 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 10   # Run for 10 seconds
+      arrivalRate: 10  # 10 new users per second
+
+scenarios:
+  - flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "testuser@semo.edu"
+            password: "testpassword123"
