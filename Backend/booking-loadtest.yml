@@ -1,0 +1,21 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 10
+      arrivalRate: 10
+
+  payload:
+    path: "token_payload.csv"
+    fields:
+      - token
+
+scenarios:
+  - flow:
+      - post:
+          url: "/api/bookings/create"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            device_id: 1
+            start_time: "{{ nowPlus1hr }}"
+            end_time: "{{ nowPlus2hr }}"

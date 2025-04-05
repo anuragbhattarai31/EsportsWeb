@@ -2,19 +2,18 @@
 const jwt = require('jsonwebtoken');
 
 function authenticateToken(req, res, next) {
-    const token = req.header("Authorization")?.split(" ")[1];
+  const token = req.header("Authorization")?.split(" ")[1];
 
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+  if (!token) return res.status(401).json({ error: "Missing token" });
 
-    try{
-         const user = jwt.verify(token, process.env.JWT_SECRET);
-         req.user = user;
-         next();
-    } catch (err) {
-        return res.status(500).json({ error: "Server error" });
-    };
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" }); 
+  }
 }
-
 const isAdmin = (req, res, next) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ error: "Admin access required" });

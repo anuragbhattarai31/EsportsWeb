@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes"); // Import auth rout
 const bookingRoutes = require("./routes/bookingRoutes"); // Import booking routes
 const adminRoutes = require("./routes/adminRoutes"); // Import admin routes
 const clubRegistrationRoutes = require('./routes/clubRegistrationRoutes');
+let server; 
 
 dotenv.config();
 const cron = require('node-cron');
@@ -31,23 +32,24 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/club-registrations', clubRegistrationRoutes);
 app.use('/api/teams', require('./routes/teamRoutes'));
 
-// Test Database Connection
-pool.connect()
-    .then(() => console.log(" Database connected successfully"))
-    .catch(err => console.error(" Error connecting to database:", err));
 
 // Start the Server
-app.listen(PORT, () => {
+if (require.main === module) {
+  server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-});
+  });
+}
 
-cron.schedule('0 * * * *', async () => {
+if (process.env.NODE_ENV !== "test") {
+  cron.schedule('0 * * * *', async () => {
     try {
-      const result = await pool.query(
-        'DELETE FROM bookings WHERE end_time < NOW()'
-      );
+      const result = await pool.query('DELETE FROM bookings WHERE end_time < NOW()');
       console.log(`Cleaned up ${result.rowCount} expired bookings`);
     } catch (error) {
       console.error('Hourly booking cleanup failed:', error);
     }
   });
+}
+
+
+  module.exports ={app,server} // Export the app for testing purposes
