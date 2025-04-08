@@ -1,11 +1,11 @@
-
+import {format} from "date-fns"
 import { useRef, useState, useEffect, Suspense } from "react"
 import { Canvas } from "@react-three/fiber"
-import { OrbitControls, PerspectiveCamera, Environment, Stars, useGLTF } from "@react-three/drei"
+import {PerspectiveCamera, Environment, Stars, useGLTF } from "@react-three/drei"
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent } from "@/Components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs"
-import { ChevronLeft, ChevronRight, Trophy, Users, Calendar, ArrowRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Trophy, Users, Calendar, ArrowRight,MapPin } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import Header from "../Components/Header"
@@ -15,29 +15,9 @@ import Footer from "../Components/Footer"
 export default function LandingPage() {
   const navigate = useNavigate()
   const [teams, setTeams] = useState([])
-  const [upcomingEvents, setUpcomingEvents] = useState([
-    {
-      id: 1,
-      title: "SEMO Valorant Tournament",
-      date: "April 15, 2025",
-      location: "Esports Arena",
-      image: "/placeholder.svg?height=250&width=400",
-    },
-    {
-      id: 2,
-      title: "League of Legends Regional Qualifier",
-      date: "April 22, 2025",
-      location: "Online",
-      image: "/placeholder.svg?height=250&width=400",
-    },
-    {
-      id: 3,
-      title: "Rocket League Championship",
-      date: "May 5, 2025",
-      location: "Main Campus",
-      image: "/placeholder.svg?height=250&width=400",
-    },
-  ])
+  const [news, setNews] = useState([])
+  const[upcomingEvents, setUpcomingEvents] = useState([])
+
 
   const newsSliderRef = useRef(null)
   const eventsSliderRef = useRef(null)
@@ -74,6 +54,33 @@ export default function LandingPage() {
     }
     fetchTeams()
   }, [])
+
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/news');
+        const data = await response.json();
+        setNews(data);
+      } catch (error) {
+        console.error("Error fetching news:", error);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/events');
+        const data = await response.json();
+        setUpcomingEvents(data);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-semoblack to-dark-200">
@@ -344,51 +351,32 @@ export default function LandingPage() {
               className="flex gap-6 overflow-x-auto pb-6 snap-x scrollbar-hide"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {upcomingEvents.map((event, index) => (
-                <div key={index} className="min-w-[300px] md:min-w-[400px] snap-start">
-                  <Card className="bg-dark-300 border-gray-700/30 overflow-hidden h-full hover:border-semored transition-colors">
-                    <div className="h-48 overflow-hidden relative">
-                      <img
-                        src={event.image || "/placeholder.svg"}
-                        alt={event.title}
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                      <div className="absolute top-0 left-0 bg-semored text-white px-3 py-1 text-xs font-bold">
-                        {event.date}
-                      </div>
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
-                      <div className="flex items-center text-gray-400 mb-4">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        <span className="text-sm">{event.location}</span>
-                      </div>
-                      <Button variant="outline" className="w-full border-semored/30 text-semored hover:bg-semored/10">
-                        Register Now
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+            
+{upcomingEvents.map((event) => (
+  <div key={event.id} className="min-w-[300px] md:min-w-[400px] snap-start">
+    <Card className="bg-dark-300 border-gray-700/30 overflow-hidden h-full hover:border-semored transition-colors">
+      <CardContent className="p-6">
+        <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
+        <div className="flex items-center text-gray-400 mb-4">
+          <Calendar className="h-4 w-4 mr-2" />
+          <span className="text-sm">
+            {format(new Date(event.date), "MMM d, yyyy HH:mm")}
+          </span>
+        </div>
+        <div className="flex items-center text-gray-400 mb-4">
+          <MapPin className="h-4 w-4 mr-2" />
+          <span className="text-sm">{event.location}</span>
+        </div>
+        <p className="text-gray-400 mb-4 line-clamp-2">
+          {event.description}
+        </p>
+        <Button variant="outline" className="w-full border-semored/30 text-semored hover:bg-semored/10">
+          Register Now
+        </Button>
+      </CardContent>
+    </Card>
+  </div>
+))}
             </div>
           </div>
         </section>
@@ -428,66 +416,41 @@ export default function LandingPage() {
               className="flex gap-6 overflow-x-auto pb-6 snap-x scrollbar-hide"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {[
-                {
-                  title: "SEMO Valorant Team Advances to Nationals",
-                  date: "March 5, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                  excerpt:
-                    "Our Valorant team has secured their spot in the national championship after an impressive regional performance.",
-                },
-                {
-                  title: "New Gaming PCs Installed in Arena",
-                  date: "February 28, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                  excerpt:
-                    "The esports arena has been upgraded with state-of-the-art gaming PCs featuring the latest hardware.",
-                },
-                {
-                  title: "Spring Tryouts Announced",
-                  date: "February 15, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                  excerpt:
-                    "Looking to join one of our competitive teams? Spring tryouts will be held next month for all game titles.",
-                },
-                {
-                  title: "SEMO Hosts Regional Tournament",
-                  date: "January 30, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                  excerpt:
-                    "Southeast Missouri State University will host the Midwest Collegiate Esports Tournament this spring.",
-                },
-                {
-                  title: "Rocket League Team Secures Sponsorship",
-                  date: "January 22, 2025",
-                  image: "/placeholder.svg?height=250&width=400",
-                  excerpt:
-                    "Our Rocket League team has secured a major sponsorship deal with a leading gaming peripheral company.",
-                },
-              ].map((news, index) => (
-                <div key={index} className="min-w-[300px] md:min-w-[400px] snap-start">
-                  <Card className="bg-dark-300 border-gray-700/30 overflow-hidden h-full hover:border-semored transition-colors">
-                    <div className="h-48 overflow-hidden">
-                      <img
-                        src={news.image || "/placeholder.svg"}
-                        alt={news.title}
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                    <CardContent className="p-6">
-                      <p className="text-sm text-semored mb-2">{news.date}</p>
-                      <h3 className="text-xl font-bold text-white mb-2">{news.title}</h3>
-                      <p className="text-gray-400 mb-4 line-clamp-2">{news.excerpt}</p>
-                      <a
-                        href="#"
-                        className="text-semored hover:text-semored/80 text-sm font-medium inline-flex items-center"
-                      >
-                        Read More <ArrowRight className="ml-1 h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+              {news.map((newsItem) => (
+  <div key={newsItem.id} className="min-w-[300px] md:min-w-[400px] snap-start">
+    <Card className="bg-dark-300 border-gray-700/30 overflow-hidden h-full hover:border-semored transition-colors">
+      <div className="h-48 overflow-hidden">
+     
+      
+      <img
+  src={newsItem.image_url || "/placeholder.svg"}
+  alt={newsItem.title}
+  className="w-full h-full object-cover transition-transform hover:scale-105"
+  onError={(e) => {
+    if (e.target.src !== "/placeholder.svg") {
+      e.target.src = "/placeholder.svg";
+      e.target.onerror = null;
+    }
+  }}
+/>
+      </div>
+      <CardContent className="p-6">
+        <p className="text-sm text-semored mb-2">
+          {format(new Date(newsItem.created_at), "MMM d, yyyy")}
+        </p>
+        <h3 className="text-xl font-bold text-white mb-2">{newsItem.title}</h3>
+        <p className="text-gray-400 mb-4 line-clamp-2">{newsItem.excerpt}</p>
+        
+<Link 
+  to={`/news/${newsItem.id}`} 
+  className="text-semored hover:text-semored/80 text-sm font-medium inline-flex items-center"
+>
+  Read More <ArrowRight className="ml-1 h-4 w-4" />
+</Link>
+      </CardContent>
+    </Card>
+  </div>
+))}
             </div>
           </div>
         </section>

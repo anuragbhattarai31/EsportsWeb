@@ -191,6 +191,24 @@ const AdminDashboard = () => {
     }
   }
 
+  const handleDeleteNews = async (newsId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/news/${newsId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+  
+      if (response.ok) {
+        setNews(news.filter(item => item.id !== newsId));
+      }
+    } catch (error) {
+      console.error("Failed to delete news:", error);
+    }
+  };
+  
+
   // Add new handler function
   const handleRegistrationDecision = async (id, status) => {
     try {
@@ -279,6 +297,120 @@ const AdminDashboard = () => {
     }
   }
 
+  // Add state
+const [events, setEvents] = useState([]);
+const [newEvent, setNewEvent] = useState({
+  title: '',
+  date: '',
+  location: '',
+  description: ''
+});
+
+// Add fetch function
+const fetchEvents = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/events');
+    const data = await response.json();
+    setEvents(data);
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+  }
+};
+
+// Add to useEffect
+fetchEvents();
+
+// Add event handlers
+const handleCreateEvent = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch('http://localhost:5000/api/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(newEvent)
+    });
+
+    if (response.ok) {
+      const createdEvent = await response.json();
+      setEvents([...events, createdEvent]);
+      setNewEvent({ title: '', date: '', location: '', description: '' });
+    }
+  } catch (error) {
+    console.error("Event creation failed:", error);
+  }
+};
+
+const handleDeleteEvent = async (eventId) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (response.ok) {
+      setEvents(events.filter(event => event.id !== eventId));
+    }
+  } catch (error) {
+    console.error("Failed to delete event:", error);
+  }
+};
+    
+
+  // Add new state
+const [news, setNews] = useState([]);
+const [newNews, setNewNews] = useState({
+  title: '',
+  excerpt: '',
+  content: '',
+  image: null
+});
+
+// Add fetch function
+const fetchNews = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/news');
+    const data = await response.json();
+    setNews(data);
+  } catch (error) {
+    console.error("Failed to fetch news:", error);
+  }
+};
+
+// Add form submit handler
+const handleNewsSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+  formData.append('title', newNews.title);
+  formData.append('excerpt', newNews.excerpt);
+  formData.append('content', newNews.content);
+  if (newNews.image) formData.append('image', newNews.image);
+
+  try {
+    const response = await fetch('http://localhost:5000/api/news', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      const createdNews = await response.json();
+      setNews([createdNews, ...news]);
+      setNewNews({ title: '', excerpt: '', content: '', image: null });
+    }
+  } catch (error) {
+    console.error("News creation failed:", error);
+  }
+};
+
+
+
   useEffect(() => {
     const fetchDashboard = async () => {
       const token = localStorage.getItem("token")
@@ -309,6 +441,7 @@ const AdminDashboard = () => {
           fetchApprovedMembers()
           setLoadingStats(false)
           fetchTeams()
+          fetchNews()
         } else {
           localStorage.removeItem("token")
           navigate("/login")
@@ -707,6 +840,141 @@ const AdminDashboard = () => {
                     )}
                   </div>
                 </Tab>
+                <Tab eventKey="news" title="News Management">
+  <div className="mt-6 bg-dark-300/30 rounded-lg border border-gray-700/30 p-6">
+    <h4 className="text-lg font-medium mb-4 text-semored font-gaming">CREATE NEWS</h4>
+    <form onSubmit={handleNewsSubmit} className="space-y-4">
+      <input
+        type="text"
+        placeholder="News Title"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newNews.title}
+        onChange={(e) => setNewNews({...newNews, title: e.target.value})}
+        required
+      />
+      <textarea
+        placeholder="Excerpt"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newNews.excerpt}
+        onChange={(e) => setNewNews({...newNews, excerpt: e.target.value})}
+      />
+      <textarea
+        placeholder="Content"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md h-32"
+        value={newNews.content}
+        onChange={(e) => setNewNews({...newNews, content: e.target.value})}
+        required
+      />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setNewNews({...newNews, image: e.target.files[0]})}
+        className="text-white"
+      />
+      <button
+        type="submit"
+        className="px-4 py-2 bg-semored text-white rounded-md hover:bg-semored/90"
+      >
+        Publish News
+      </button>
+    </form>
+
+    <h4 className="text-lg font-medium mt-8 mb-4 text-semored font-gaming">EXISTING NEWS</h4>
+<div className="space-y-4">
+  {news.map((item) => (
+    <div key={item.id} className="bg-dark-200 p-4 rounded-lg border border-gray-700/30 flex justify-between items-center">
+      <div>
+        <h5 className="text-white font-medium">{item.title}</h5>
+        <p className="text-gray-400 text-sm mt-2">{item.excerpt}</p>
+      </div>
+      <button
+        onClick={() => handleDeleteNews(item.id)}
+        className="text-red-500 hover:text-red-400 p-2 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </button>
+    </div>
+  ))}
+</div>
+  </div>
+</Tab>
+
+<Tab eventKey="events" title="Manage Events">
+  <div className="mt-6 bg-dark-300/30 rounded-lg border border-gray-700/30 p-6">
+    <h4 className="text-lg font-medium mb-4 text-semored font-gaming">CREATE NEW EVENT</h4>
+    <form onSubmit={handleCreateEvent} className="space-y-4 mb-8">
+      <input
+        type="text"
+        placeholder="Event Title"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newEvent.title}
+        onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+        required
+      />
+      <input
+        type="datetime-local"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newEvent.date}
+        onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Location"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newEvent.location}
+        onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+        required
+      />
+      <textarea
+        placeholder="Description"
+        className="w-full p-3 bg-dark-300 text-white border border-gray-700 rounded-md"
+        value={newEvent.description}
+        onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+      />
+      <button
+        type="submit"
+        className="px-4 py-2 bg-semored text-white rounded-md hover:bg-semored/90"
+      >
+        Create Event
+      </button>
+    </form>
+
+    <h4 className="text-lg font-medium mt-8 mb-4 text-semored font-gaming">UPCOMING EVENTS</h4>
+    <div className="space-y-4">
+      {events.map((event) => (
+        <div key={event.id} className="bg-dark-200 p-4 rounded-lg border border-gray-700/30 flex justify-between items-center">
+          <div>
+            <h5 className="text-white font-medium">{event.title}</h5>
+            <p className="text-gray-400 text-sm mt-2">
+              {new Date(event.date).toLocaleDateString()} - {event.location}
+            </p>
+          </div>
+          <button
+            onClick={() => handleDeleteEvent(event.id)}
+            className="text-red-500 hover:text-red-400 p-2 transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+</Tab>
+
               </Tabs>
             </div>
           </div>

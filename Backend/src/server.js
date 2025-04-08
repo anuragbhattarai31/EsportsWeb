@@ -6,7 +6,10 @@ const authRoutes = require("./routes/authRoutes"); // Import auth rout
 const bookingRoutes = require("./routes/bookingRoutes"); // Import booking routes
 const adminRoutes = require("./routes/adminRoutes"); // Import admin routes
 const clubRegistrationRoutes = require('./routes/clubRegistrationRoutes');
+const newsRoutes = require('./routes/newsRoutes');
+const eventsRoutes = require('./routes/eventsRoutes');
 let server; 
+const path = require('path');
 
 dotenv.config();
 const cron = require('node-cron');
@@ -31,6 +34,13 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/club-registrations', clubRegistrationRoutes);
 app.use('/api/teams', require('./routes/teamRoutes'));
+app.use('/api/news', newsRoutes);
+app.use('/api/events', eventsRoutes);
+
+const uploadsPath = path.join(__dirname, 'public/uploads');
+app.use('/uploads', express.static(uploadsPath));
+console.log('Serving static files from:', uploadsPath);
+console.log('Static files served from:', path.join(__dirname, 'public/uploads'));
 
 
 // Start the Server

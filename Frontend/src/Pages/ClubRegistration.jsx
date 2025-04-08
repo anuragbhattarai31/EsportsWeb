@@ -15,7 +15,7 @@ const ClubRegistrationForm = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch("/api/club-registrations", {
+      const response = await fetch("http://localhost:5000/api/club-registrations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

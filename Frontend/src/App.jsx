@@ -10,6 +10,7 @@ import LandingPage from './Pages/landingpage';
 import ClubRegistration from './Pages/ClubRegistration';
 import './index.css';
 import TeamDetailsPage from './Pages/TeamDetailsPage';
+import NewsDetailPage from './Pages/NewsDetailPage';
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="/adminDashboard" element = {<AdminDashboard/>} />
             <Route path="/club-registration" element={<ClubRegistration />} />
             <Route path="/teams/:id" element={<TeamDetailsPage/>}/>
+            <Route path="/news/:id" element={<NewsDetailPage/>}/>
             <Route path="/" element={< LandingPage/>} /> {/* Default route */}
           
         </Routes>
