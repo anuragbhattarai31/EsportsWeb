@@ -18,7 +18,7 @@ export default function LandingPage() {
   const [upcomingEvents, setUpcomingEvents] = useState([
     {
       id: 1,
-      title: "SEMO Valorant Tournament",
+      title: " SEMO REDHAWK Valorant Tournament",
       date: "April 15, 2025",
       location: "Esports Arena",
       image: "/placeholder.svg?height=250&width=400",
