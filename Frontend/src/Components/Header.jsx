@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect, useRef } from "react"
+import { Link, useLocation } from "react-router-dom"
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -9,17 +9,37 @@ const Header = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [username, setUsername] = useState("")
   const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
+  const isLandingPage = location.pathname === "/"
+  const userDropdownRef = useRef(null)
 
   const toggleMenu = () => setIsOpen(!isOpen)
   const handleMouseEnter = () => setIsDropdownOpen(true)
   const handleMouseLeave = () => setTimeout(() => setIsDropdownOpen(false), 200)
-  const handleUserMouseEnter = () => setIsUserDropdownOpen(true)
-  const handleUserMouseLeave = () => setIsUserDropdownOpen(false)
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     window.location.href = "/login"
   }
+
+  // Handle clicks outside the dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserDropdownOpen(false)
+      }
+    }
+
+    // Add event listener if dropdown is open
+    if (isUserDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isUserDropdownOpen])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,22 +88,21 @@ const Header = () => {
       <div className="max-w-6xl mx-auto flex justify-between items-center text-white">
         {/* Logo */}
         <div className="flex items-center space-x-4 ml-4">
-        <img
-    src="/images/semo logo.png"
-    alt="Semo Logo"
-    className="w-20 h-20 object-contain transition-transform duration-500 hover:scale-110 hover:rotate-3 hover:drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]"
-  />
-  <div className="font-esports text-4xl font-bold italic flex items-center space-x-2">
-    <span className="text-semored drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:scale-110 hover:-skew-x-6 transition-transform duration-300 ease-in-out">
-      GO
-    </span>
-    <span className="text-white drop-shadow-[2px_2px_0_rgba(255,0,0,0.5)] hover:scale-105 hover:skew-x-6 transition-transform duration-300 ease-in-out">
-      REDHAWKS
-    </span>
-  </div>
+          <img
+            src="/images/semo logo.png"
+            alt="Semo Logo"
+            className="w-20 h-20 object-contain transition-transform duration-500 hover:scale-110 hover:rotate-3 hover:drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]"
+          />
+          <div className="font-esports text-4xl font-bold italic flex items-center space-x-2">
+            <span className="text-semored drop-shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:scale-110 hover:-skew-x-6 transition-transform duration-300 ease-in-out">
+              GO
+            </span>
+            <span className="text-white drop-shadow-[2px_2px_0_rgba(255,0,0,0.5)] hover:scale-105 hover:skew-x-6 transition-transform duration-300 ease-in-out">
+              REDHAWKS
+            </span>
+          </div>
 
-
-     {/* Dropdown */}
+          {/* Dropdown */}
           <div
             className={`absolute top-full left-0 min-w-[700px] glassmorphism text-white p-6 rounded-lg transition-all duration-300 ease-out ${
               isDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
@@ -96,18 +115,23 @@ const Header = () => {
               <div>
                 <h3 className="font-gaming text-lg text-semored pb-4 border-b border-gray-600/50">Games</h3>
                 <div className="space-y-1 mt-2">
-                  {["Valorant", "Rocket League", "CSGO", "Rainbow Six Siege", "League of Legends", "Genshin Impact"].map(
-                    (game) => (
-                      <a
-                        key={game}
-                        href="#"
-                        className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored flex items-center"
-                      >
-                        <span className="w-2 h-2 bg-semored rounded-full mr-2 opacity-70"></span>
-                        {game}
-                      </a>
-                    )
-                  )}
+                  {[
+                    "Valorant",
+                    "Rocket League",
+                    "CSGO",
+                    "Rainbow Six Siege",
+                    "League of Legends",
+                    "Genshin Impact",
+                  ].map((game) => (
+                    <a
+                      key={game}
+                      href="#"
+                      className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored flex items-center"
+                    >
+                      <span className="w-2 h-2 bg-semored rounded-full mr-2 opacity-70"></span>
+                      {game}
+                    </a>
+                  ))}
                 </div>
               </div>
 
@@ -150,44 +174,91 @@ const Header = () => {
 
         {/* Nav & User Area */}
         <div className="flex items-center space-x-6">
-          <nav className="hidden md:flex gap-6 text-sm font-medium">
-            {["Home", "Teams", "Events", "News"].map((nav) => (
-              <Link
-                key={nav}
-                to="#"
+          {/* Only show navigation links on the landing page */}
+          {isLandingPage && (
+            <nav className="hidden md:flex gap-6 text-sm font-medium">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
                 className="hover:text-semored transition-colors hover:underline underline-offset-4"
               >
-                {nav}
-              </Link>
-            ))}
-          </nav>
+                Home
+              </a>
+              <a
+                href="#teams-section"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.getElementById("teams-section")?.scrollIntoView({ behavior: "smooth" })
+                }}
+                className="hover:text-semored transition-colors hover:underline underline-offset-4"
+              >
+                Teams
+              </a>
+              <a
+                href="#events-section"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.getElementById("events-section")?.scrollIntoView({ behavior: "smooth" })
+                }}
+                className="hover:text-semored transition-colors hover:underline underline-offset-4"
+              >
+                Events
+              </a>
+              <a
+                href="#news-section"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.getElementById("news-section")?.scrollIntoView({ behavior: "smooth" })
+                }}
+                className="hover:text-semored transition-colors hover:underline underline-offset-4"
+              >
+                News
+              </a>
+            </nav>
+          )}
 
           {/* User Avatar */}
-          <div className="relative" onMouseEnter={handleUserMouseEnter} onMouseLeave={handleUserMouseLeave}>
-            <div className="flex items-center cursor-pointer bg-dark-200 px-3 py-1.5 rounded-md hover:bg-dark-100 transition-colors">
+          <div className="relative" ref={userDropdownRef}>
+            <div
+              className="flex items-center cursor-pointer bg-dark-200 px-3 py-1.5 rounded-md hover:bg-dark-100 transition-colors"
+              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+            >
               <div className="w-8 h-8 bg-semored/20 rounded-full flex items-center justify-center mr-2">
                 <span className="font-bold text-semored">{username ? username.charAt(0).toUpperCase() : "G"}</span>
               </div>
               <span>{username || "Guest"}</span>
             </div>
             <div
-              className={`absolute top-full right-0 min-w-[180px] glassmorphism text-white p-2 rounded-lg shadow-lg transition-all duration-300 ease-out ${
-                isUserDropdownOpen
-                  ? "scale-100 opacity-100 translate-y-2"
-                  : "scale-95 opacity-0 translate-y-0 pointer-events-none"
+              className={`absolute top-full right-0 min-w-[180px] glassmorphism text-white p-2 rounded-lg shadow-lg transition-all duration-300 ease-out mt-2 ${
+                isUserDropdownOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
               }`}
             >
-              <Link to="#" className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored">
+              <Link
+                to="#"
+                className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored"
+                onClick={() => setIsUserDropdownOpen(false)}
+              >
                 Profile
               </Link>
-              <Link to="#" className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored">
+              <Link
+                to="#"
+                className="block py-2 px-3 hover:bg-dark-100 rounded-md transition-colors hover:text-semored"
+                onClick={() => setIsUserDropdownOpen(false)}
+              >
                 Settings
               </Link>
               <div className="my-1 border-t border-gray-700/50"></div>
               <a
                 href="#"
                 className="block py-2 px-3 hover:bg-semored/10 rounded-md transition-colors text-semored hover:bg-semored/20"
-                onClick={handleLogout}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setIsUserDropdownOpen(false)
+                  handleLogout()
+                }}
               >
                 Logout
               </a>
@@ -224,11 +295,55 @@ const Header = () => {
             <span className="text-white">MO</span>
           </div>
           <nav className="flex flex-col gap-6 text-center text-xl font-medium">
-            {["Home", "Teams", "Events", "News"].map((item) => (
-              <Link key={item} to="#" className="hover:text-semored" onClick={toggleMenu}>
-                {item}
-              </Link>
-            ))}
+            {/* Only show navigation links on the landing page in mobile menu */}
+            {isLandingPage && (
+              <>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                    toggleMenu()
+                  }}
+                  className="hover:text-semored"
+                >
+                  Home
+                </a>
+                <a
+                  href="#teams-section"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById("teams-section")?.scrollIntoView({ behavior: "smooth" })
+                    toggleMenu()
+                  }}
+                  className="hover:text-semored"
+                >
+                  Teams
+                </a>
+                <a
+                  href="#events-section"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById("events-section")?.scrollIntoView({ behavior: "smooth" })
+                    toggleMenu()
+                  }}
+                  className="hover:text-semored"
+                >
+                  Events
+                </a>
+                <a
+                  href="#news-section"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    document.getElementById("news-section")?.scrollIntoView({ behavior: "smooth" })
+                    toggleMenu()
+                  }}
+                  className="hover:text-semored"
+                >
+                  News
+                </a>
+              </>
+            )}
             {username ? (
               <>
                 <Link to="#" className="hover:text-semored" onClick={toggleMenu}>
@@ -263,4 +378,3 @@ const Header = () => {
 }
 
 export default Header
-
