@@ -3,10 +3,137 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { format } from "date-fns"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+
+// Simple embedded calendar component
+const EmbeddedCalendar = ({
+  selectedDate,
+  onDateSelect,
+  minDate,
+  activeTimeSelector,
+  startTime,
+  setStartTime,
+  endTime,
+  setEndTime,
+}) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date())
+
+  // Get days in month
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate()
+  }
+
+  // Get day of week for first day of month (0 = Sunday, 6 = Saturday)
+  const getFirstDayOfMonth = (year, month) => {
+    return new Date(year, month, 1).getDay()
+  }
+
+  const year = currentMonth.getFullYear()
+  const month = currentMonth.getMonth()
+  const daysInMonth = getDaysInMonth(year, month)
+  const firstDayOfMonth = getFirstDayOfMonth(year, month)
+
+  // Create calendar days array
+  const days = []
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    days.push(null) // Empty cells for days before the 1st
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    days.push(day)
+  }
+
+  // Format date for comparison
+  const formatDateForComparison = (date) => {
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+  }
+
+  // Check if a day is selected
+  const isSelected = (day) => {
+    if (!day || !selectedDate) return false
+    const dayDate = new Date(year, month, day)
+    return formatDateForComparison(dayDate) === formatDateForComparison(selectedDate)
+  }
+
+  // Check if a day is in the past
+  const isPast = (day) => {
+    if (!day) return false
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const dayDate = new Date(year, month, day)
+    return dayDate < today
+  }
+
+  // Handle month navigation
+  const prevMonth = () => {
+    setCurrentMonth(new Date(year, month - 1, 1))
+  }
+
+  const nextMonth = () => {
+    setCurrentMonth(new Date(year, month + 1, 1))
+  }
+
+  // Handle day selection
+  const handleDayClick = (day) => {
+    if (!day || isPast(day)) return
+    try {
+      if (activeTimeSelector === "start") {
+        const newDate = new Date(startTime)
+        newDate.setFullYear(year, month, day)
+        setStartTime(newDate)
+      } else {
+        const newDate = new Date(endTime)
+        newDate.setFullYear(year, month, day)
+        setEndTime(newDate)
+      }
+    } catch (err) {
+      console.error("Error setting date:", err)
+    }
+  }
+
+  const weekdays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+
+  return (
+    <div className="bg-dark-300 border border-gray-700 rounded-md p-4">
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={prevMonth} className="p-1 rounded-md hover:bg-dark-200 text-gray-400">
+          &lt;
+        </button>
+        <h3 className="text-white font-medium">
+          {currentMonth.toLocaleString("default", { month: "long" })} {year}
+        </h3>
+        <button onClick={nextMonth} className="p-1 rounded-md hover:bg-dark-200 text-gray-400">
+          &gt;
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {weekdays.map((day) => (
+          <div key={day} className="text-center text-xs text-gray-400 py-1">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day, index) => (
+          <div
+            key={index}
+            onClick={() => handleDayClick(day)}
+            className={`
+              h-8 w-8 flex items-center justify-center rounded-md text-sm
+              ${!day ? "invisible" : isPast(day) ? "text-gray-600 cursor-not-allowed" : "cursor-pointer hover:bg-semored/20"}
+              ${isSelected(day) ? "bg-semored text-white" : ""}
+            `}
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 const Dashboard = () => {
   const [registrationStatus, setRegistrationStatus] = useState("")
@@ -18,11 +145,37 @@ const Dashboard = () => {
   const [userBookings, setUserBookings] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [activeTimeSelector, setActiveTimeSelector] = useState("start") // "start" or "end"
   const navigate = useNavigate()
+
+  // Update end time when start time changes to maintain minimum 30 min difference
+  useEffect(() => {
+    const minEndTime = new Date(startTime.getTime() + 30 * 60000) // 30 minutes later
+    if (endTime < minEndTime) {
+      setEndTime(minEndTime)
+    }
+  }, [startTime])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     navigate("/login")
+  }
+
+  // Handle date selection from calendar
+  const handleDateSelect = (date) => {
+    try {
+      if (activeTimeSelector === "start") {
+        const newStartTime = new Date(startTime)
+        newStartTime.setFullYear(date.getFullYear(), date.getMonth(), date.getDate())
+        setStartTime(newStartTime)
+      } else {
+        const newEndTime = new Date(endTime)
+        newEndTime.setFullYear(date.getFullYear(), date.getMonth(), date.getDate())
+        setEndTime(newEndTime)
+      }
+    } catch (err) {
+      console.error("Error in date selection:", err)
+    }
   }
 
   //FETCH-BOOKINGS Function
@@ -354,73 +507,141 @@ const Dashboard = () => {
             </h2>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">START TIME</label>
-                <DatePicker
-                  selected={startTime}
-                  onChange={(date) => setStartTime(date)}
-                  showTimeSelect
-                  minDate={new Date()}
-                  dateFormat="MMMM d, yyyy h:mm aa"
-                  className="w-full p-3 bg-dark-300 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-semored focus:border-transparent transition-all"
-                />
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Left side - Time inputs */}
+              <div className="w-full md:w-1/2 space-y-6">
+                {/* Start Time */}
+                <div
+                  className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                    activeTimeSelector === "start"
+                      ? "border-semored bg-semored/10"
+                      : "border-gray-700/30 bg-dark-300/50 hover:border-semored/50"
+                  }`}
+                  onClick={() => setActiveTimeSelector("start")}
+                >
+                  <label className="block text-sm font-medium text-gray-300 mb-2">START TIME</label>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xl font-medium text-white">{format(startTime, "MMM d, yyyy")}</div>
+                    <input
+                      type="time"
+                      value={`${startTime.getHours().toString().padStart(2, "0")}:${startTime.getMinutes().toString().padStart(2, "0")}`}
+                      onChange={(e) => {
+                        try {
+                          const newDate = new Date(startTime)
+                          const [hours, minutes] = e.target.value.split(":")
+                          if (hours && minutes) {
+                            newDate.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10))
+                            setStartTime(newDate)
+                          }
+                        } catch (err) {
+                          console.error("Error setting start time:", err)
+                          // Don't update state if there's an error
+                        }
+                      }}
+                      className="p-2 bg-dark-200 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-semored focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* End Time */}
+                <div
+                  className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                    activeTimeSelector === "end"
+                      ? "border-semored bg-semored/10"
+                      : "border-gray-700/30 bg-dark-300/50 hover:border-semored/50"
+                  }`}
+                  onClick={() => setActiveTimeSelector("end")}
+                >
+                  <label className="block text-sm font-medium text-gray-300 mb-2">END TIME</label>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xl font-medium text-white">{format(endTime, "MMM d, yyyy")}</div>
+                    <input
+                      type="time"
+                      value={`${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`}
+                      onChange={(e) => {
+                        try {
+                          const newDate = new Date(endTime)
+                          const [hours, minutes] = e.target.value.split(":")
+                          if (hours && minutes) {
+                            newDate.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10))
+                            setEndTime(newDate)
+                          }
+                        } catch (err) {
+                          console.error("Error setting end time:", err)
+                          // Don't update state if there's an error
+                        }
+                      }}
+                      className="p-2 bg-dark-200 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-semored focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Duration Display */}
+                <div className="p-4 rounded-lg border border-gray-700/30 bg-dark-300/50">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">BOOKING DURATION</label>
+                  <div className="text-xl font-medium text-white">
+                    {Math.floor((endTime - startTime) / (1000 * 60))} minutes
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="p-4 bg-red-900/20 border border-red-900/30 rounded-md">
+                    <p className="text-red-400 text-sm">{error}</p>
+                  </div>
+                )}
+
+                <button
+                  onClick={checkAvailability}
+                  disabled={loading}
+                  className="w-full px-6 py-3 bg-semored text-white rounded-md hover:bg-semored/90 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      CHECKING...
+                    </span>
+                  ) : (
+                    "CHECK AVAILABILITY"
+                  )}
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">END TIME</label>
-                <DatePicker
-                  selected={endTime}
-                  onChange={(date) => setEndTime(date)}
-                  showTimeSelect
-                  minDate={startTime}
-                  dateFormat="MMMM d, yyyy h:mm aa"
-                  className="w-full p-3 bg-dark-300 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-semored focus:border-transparent transition-all"
+
+              {/* Right side - Calendar */}
+              <div className="w-full md:w-1/2">
+                <EmbeddedCalendar
+                  selectedDate={activeTimeSelector === "start" ? startTime : endTime}
+                  onDateSelect={handleDateSelect}
+                  minDate={activeTimeSelector === "end" ? startTime : new Date()}
+                  activeTimeSelector={activeTimeSelector}
+                  startTime={startTime}
+                  setStartTime={setStartTime}
+                  endTime={endTime}
+                  setEndTime={setEndTime}
                 />
               </div>
             </div>
 
-            {error && (
-              <div className="p-4 mb-6 bg-red-900/20 border border-red-900/30 rounded-md">
-                <p className="text-red-400 text-sm">{error}</p>
-              </div>
-            )}
-
-            <button
-              onClick={checkAvailability}
-              disabled={loading}
-              className="px-6 py-3 bg-semored text-white rounded-md hover:bg-semored/90 disabled:opacity-50 transition-colors mb-6"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  CHECKING...
-                </span>
-              ) : (
-                "CHECK AVAILABILITY"
-              )}
-            </button>
-
             {availableDevices.length > 0 && (
-              <div className="mb-6">
+              <div className="mt-6">
                 <h3 className="text-xl font-bold mb-4 text-semored font-gaming">AVAILABLE DEVICES</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {availableDevices.map((device) => (
@@ -538,4 +759,3 @@ const Dashboard = () => {
 }
 
 export default Dashboard
-

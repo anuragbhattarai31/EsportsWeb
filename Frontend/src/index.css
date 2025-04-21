@@ -311,3 +311,49 @@ body {
   mask-composite: exclude;
 }
 
+/* Add these styles at the end of the file for the calendar */
+.react-calendar {
+  width: 100%;
+  background-color: #1a1f2b !important;
+  color: white !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-family: "Rajdhani", sans-serif !important;
+}
+
+.react-calendar__navigation button {
+  color: white !important;
+  font-weight: bold !important;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: rgba(230, 50, 62, 0.1) !important;
+}
+
+.react-calendar__tile {
+  color: white !important;
+  border-radius: 4px !important;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: rgba(230, 50, 62, 0.2) !important;
+}
+
+.react-calendar__tile--now {
+  background-color: rgba(230, 50, 62, 0.3) !important;
+}
+
+.react-calendar__tile--active {
+  background-color: #e6323e !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  color: #e6323e !important;
+  font-weight: bold !important;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #666 !important;
+}

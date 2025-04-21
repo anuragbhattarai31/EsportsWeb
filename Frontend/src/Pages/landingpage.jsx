@@ -20,6 +20,7 @@ export default function LandingPage() {
 
   const newsSliderRef = useRef(null)
   const eventsSliderRef = useRef(null)
+  const teamsSliderRef = useRef(null)
 
   const scrollLeft = (ref) => {
     if (ref.current) {
@@ -228,42 +229,66 @@ export default function LandingPage() {
 
             {/* Teams Section */}
             <div id="teams-section" className="mb-20">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-white font-gaming mb-4">
-                  OUR <span className="text-semored">TEAMS</span>
-                </h3>
-                <div className="w-16 h-1 bg-semored mx-auto mt-4"></div>
-                <p className="mt-4 text-gray-400 max-w-2xl mx-auto">
-                  Competitive teams representing SEMO in various esports titles
-                </p>
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h3 className="text-3xl font-bold text-white font-gaming mb-4">
+                    OUR <span className="text-semored">TEAMS</span>
+                  </h3>
+                  <p className="text-gray-400">Competitive teams representing SEMO in various esports titles</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => scrollLeft(teamsSliderRef)}
+                    className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => scrollRight(teamsSliderRef)}
+                    className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+              <div
+                ref={teamsSliderRef}
+                className="flex gap-6 overflow-x-auto pb-6 snap-x scrollbar-hide"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
                 {teams.map((team) => (
-                  <Link to={`/teams/${team.id}`} key={team.id}>
-                    <Card className="bg-dark-200 border-gray-700/30 hover:border-semored transition-all duration-300 cursor-pointer h-full overflow-hidden group">
-                      <div className="h-40 bg-gradient-to-br from-semored/20 to-dark-300 flex items-center justify-center">
-                        <div className="text-4xl font-bold font-gaming text-white group-hover:text-semored transition-colors">
-                          {team.game_name}
+                  <div key={team.id} className="min-w-[300px] md:min-w-[350px] snap-start">
+                    <Link to={`/teams/${team.id}`}>
+                      <Card className="bg-dark-200 border-gray-700/30 hover:border-semored transition-all duration-300 cursor-pointer h-full overflow-hidden group">
+                        <div className="h-40 bg-gradient-to-br from-semored/20 to-dark-300 flex items-center justify-center">
+                          <div className="text-4xl font-bold font-gaming text-white group-hover:text-semored transition-colors">
+                            {team.game_name}
+                          </div>
                         </div>
-                      </div>
-                      <CardContent className="p-6">
-                        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-semored transition-colors">
-                          {team.game_name} Team
-                        </h3>
-                        <p className="text-gray-400 line-clamp-3 mb-4">
-                          {team.description || "Competitive team representing SEMO in tournaments and leagues."}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs bg-semored/20 text-semored px-2 py-1 rounded-full">
-                            {team.players?.length || 0} Players
-                          </span>
-                          <span className="text-semored group-hover:translate-x-1 transition-transform inline-flex items-center">
-                            View Team <ArrowRight className="ml-1 h-4 w-4" />
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                        <CardContent className="p-6">
+                          <h3 className="text-xl font-bold mb-2 text-white group-hover:text-semored transition-colors">
+                            {team.game_name} Team
+                          </h3>
+                          <p className="text-gray-400 line-clamp-3 mb-4">
+                            {team.description || "Competitive team representing SEMO in tournaments and leagues."}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs bg-semored/20 text-semored px-2 py-1 rounded-full">
+                              {team.players?.length || 0} Players
+                            </span>
+                            <span className="text-semored group-hover:translate-x-1 transition-transform inline-flex items-center">
+                              View Team <ArrowRight className="ml-1 h-4 w-4" />
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
@@ -342,7 +367,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="icon"
                   onClick={() => scrollLeft(eventsSliderRef)}
-                  className="text-gray border-white/20 hover:bg-white/10"
+                  className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -350,7 +375,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="icon"
                   onClick={() => scrollRight(eventsSliderRef)}
-                  className="text-white border-white/20 hover:bg-white/10"
+                  className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -402,7 +427,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="icon"
                   onClick={() => scrollLeft(newsSliderRef)}
-                  className="text-white border-white/20 hover:bg-white/10"
+                  className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -410,7 +435,7 @@ export default function LandingPage() {
                   variant="outline"
                   size="icon"
                   onClick={() => scrollRight(newsSliderRef)}
-                  className="text-white border-white/20 hover:bg-white/10"
+                  className="text-gray-500 border-gray-700/50 hover:text-gray-300 hover:bg-gray-700/30"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
