@@ -41,8 +41,9 @@ app.use('/api/events', eventsRoutes);
 
 const uploadsPath = path.join(__dirname, 'public/uploads');
 app.use('/uploads', express.static(uploadsPath));
-console.log('Serving static files from:', uploadsPath);
-console.log('Static files served from:', path.join(__dirname, 'public/uploads'));
+// Health ping for Elastic Beanstalk load balancer
+app.get('/', (_req, res) => res.status(200).send('OK'));
+
 console.log('DB_PASSWORD =', process.env.DB_PASSWORD);
 
 // Start the Server
