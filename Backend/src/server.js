@@ -8,6 +8,7 @@ const adminRoutes = require("./routes/adminRoutes"); // Import admin routes
 const clubRegistrationRoutes = require('./routes/clubRegistrationRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const eventsRoutes = require('./routes/eventsRoutes');
+const teamRoutes = require('./routes/teamRoutes');
 let server; 
 const path = require('path');
 
@@ -33,7 +34,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/club-registrations', clubRegistrationRoutes);
-app.use('/api/teams', require('./routes/teamRoutes'));
+app.use('/api/teams', teamRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/events', eventsRoutes);
 

@@ -10,19 +10,15 @@ const Footer = () => {
           </div>
           <div className="flex space-x-4 mb-6">
             <a
-              href="#"
-              className="w-10 h-10 rounded-full bg-dark-200 flex items-center justify-center hover:bg-semored transition-colors duration-300"
-            >
+             href="https://www.youtube.com/@semoesportscontent"
+             className="w-10 h-10 rounded-full bg-dark-200 flex items-center justify-center hover:bg-semored transition-colors duration-300"
+        >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                  clipRule="evenodd"
-                ></path>
+                <path d="M23.498 6.186a2.99 2.99 0 0 0-2.104-2.11C19.524 3.5 12 3.5 12 3.5s-7.524 0-9.394.576a2.99 2.99 0 0 0-2.104 2.11C0 8.057 0 12 0 12s0 3.943.502 5.814a2.99 2.99 0 0 0 2.104 2.11C4.476 20.5 12 20.5 12 20.5s7.524 0 9.394-.576a2.99 2.99 0 0 0 2.104-2.11C24 15.943 24 12 24 12s0-3.943-.502-5.814ZM9.75 15.568V8.432L15.818 12 9.75 15.568Z"></path>
               </svg>
             </a>
             <a
-              href="#"
+              href="https://x.com/i/flow/login?redirect_after_login=%2Fsemoesports"
               className="w-10 h-10 rounded-full bg-dark-200 flex items-center justify-center hover:bg-semored transition-colors duration-300"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,7 +26,7 @@ const Footer = () => {
               </svg>
             </a>
             <a
-              href="#"
+              href="https://www.instagram.com/semo.esports/"
               className="w-10 h-10 rounded-full bg-dark-200 flex items-center justify-center hover:bg-semored transition-colors duration-300"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
