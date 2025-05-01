@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import { format } from 'date-fns';
+import { apiFetch } from '../libs/api';
 
 const NewsDetailPage = () => {
   const { id } = useParams();
@@ -13,7 +14,7 @@ const NewsDetailPage = () => {
   useEffect(() => {
     const fetchNewsItem = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/news/${id}`);
+        const response = await apiFetch(`/api/news/${id}`);
         if (!response.ok) {
           throw new Error('News article not found');
         }
@@ -62,7 +63,8 @@ const NewsDetailPage = () => {
           {newsItem.image_url && (
             <div className="mb-8 rounded-lg overflow-hidden shadow-xl">
               <img
-                src={newsItem.image_url}
+                src={`${import.meta.env.VITE_API_BASE}${newsItem.image_url}`}
+
                 alt={newsItem.title}
                 className="w-full h-96 object-cover"
                 onError={(e) => {

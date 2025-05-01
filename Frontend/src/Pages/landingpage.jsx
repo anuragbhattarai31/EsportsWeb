@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+import { apiFetch } from "../libs/api"
 
 export default function LandingPage() {
   const navigate = useNavigate()
@@ -45,7 +46,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/teams")
+        const response = await apiFetch("/api/teams")
         const data = await response.json()
         setTeams(data)
       } catch (error) {
@@ -58,7 +59,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/news")
+        const response = await apiFetch("/api/news")
         const data = await response.json()
         setNews(data)
       } catch (error) {
@@ -71,7 +72,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events")
+        const response = await apiFetch("/api/events")
         const data = await response.json()
         setUpcomingEvents(data)
       } catch (error) {

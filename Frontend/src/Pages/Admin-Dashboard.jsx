@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode"
 import { format } from "date-fns"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+import {apiFetch} from "../libs/api"
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null)
@@ -41,7 +42,7 @@ const AdminDashboard = () => {
 
   const fetchApprovedMembers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/club-registrations/admin/approved", {
+      const response = await apiFetch("/api/club-registrations/admin/approved", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       const data = await response.json()
@@ -56,7 +57,7 @@ const AdminDashboard = () => {
   // Add new fetch function
   const fetchRegistrations = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/club-registrations/admin/pending", {
+      const response = await apiFetch("/api/club-registrations/admin/pending", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       const data = await response.json()
@@ -67,7 +68,7 @@ const AdminDashboard = () => {
   }
   const fetchTeams = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/teams", {
+      const response = await apiFetch("/api/teams", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       const data = await response.json()
@@ -80,7 +81,7 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/admin/stats", {
+      const response = await apiFetch("/api/admin/stats", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       const data = await response.json()
@@ -97,10 +98,10 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("token")
 
       const [devRes, bookRes] = await Promise.all([
-        fetch("http://localhost:5000/api/admin/devices", {
+        apiFetch("/api/admin/devices", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:5000/api/admin/bookings", {
+        apiFetch("/api/admin/bookings", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ])
@@ -126,7 +127,7 @@ const AdminDashboard = () => {
 
   const handleAddDevice = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/admin/devices", {
+      const response = await apiFetch("/api/admin/devices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +148,7 @@ const AdminDashboard = () => {
 
   const handleToggleDevice = async (deviceId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/devices/${deviceId}/toggle`, {
+      const response = await apiFetch(`/api/admin/devices/${deviceId}/toggle`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -164,7 +165,7 @@ const AdminDashboard = () => {
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/bookings/${bookingId}/cancel`, {
+      const response = await apiFetch(`/api/admin/bookings/${bookingId}/cancel`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -179,7 +180,7 @@ const AdminDashboard = () => {
 
   const handleDeleteDevice = async (deviceId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/devices/${deviceId}`, {
+      const response = await apiFetch(`/api/admin/devices/${deviceId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -194,7 +195,7 @@ const AdminDashboard = () => {
 
   const handleDeleteNews = async (newsId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/news/${newsId}`, {
+      const response = await apiFetch(`/api/news/${newsId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -212,7 +213,7 @@ const AdminDashboard = () => {
   // Add new handler function
   const handleRegistrationDecision = async (id, status) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/club-registrations/admin/${id}`, {
+      const response = await apiFetch(`/api/club-registrations/admin/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -233,7 +234,7 @@ const AdminDashboard = () => {
   const handleAddPlayer = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch(`http://localhost:5000/api/teams/${selectedTeam}/players`, {
+      const response = await apiFetch(`/api/teams/${selectedTeam}/players`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -274,7 +275,7 @@ const AdminDashboard = () => {
 
   const handleRemovePlayer = async (playerId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/teams/${selectedTeam}/players/${playerId}`, {
+      const response = await apiFetch(`/api/teams/${selectedTeam}/players/${playerId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -309,7 +310,7 @@ const AdminDashboard = () => {
   // Add fetch function
   const fetchEvents = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/events")
+      const response = await apiFetch("/api/events")
       const data = await response.json()
       setEvents(data)
     } catch (error) {
@@ -324,7 +325,7 @@ const AdminDashboard = () => {
   const handleCreateEvent = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch("http://localhost:5000/api/events", {
+      const response = await apiFetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -345,7 +346,7 @@ const AdminDashboard = () => {
 
   const handleDeleteEvent = async (eventId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+      const response = await apiFetch(`/api/events/${eventId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -372,7 +373,7 @@ const AdminDashboard = () => {
   // Add fetch function
   const fetchNews = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/news")
+      const response = await apiFetch("/api/news")
       const data = await response.json()
       setNews(data)
     } catch (error) {
@@ -390,7 +391,7 @@ const AdminDashboard = () => {
     if (newNews.image) formData.append("image", newNews.image)
 
     try {
-      const response = await fetch("http://localhost:5000/api/news", {
+      const response = await apiFetch("/api/news", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -420,7 +421,7 @@ const AdminDashboard = () => {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/adminDashboard", {
+        const response = await apiFetch("/api/auth/adminDashboard", {
           headers: { Authorization: `Bearer ${token}` },
         })
 

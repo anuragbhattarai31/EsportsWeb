@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Header from "../Components/Header"
+import { apiFetch } from "../libs/api"
 
 const ClubRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ const ClubRegistrationForm = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:5000/api/club-registrations", {
+      const response = await apiFetch("/api/club-registrations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

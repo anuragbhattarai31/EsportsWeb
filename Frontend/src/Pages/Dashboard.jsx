@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { format } from "date-fns"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+import { apiFetch } from "../libs/api"
 
 // Simple embedded calendar component
 const EmbeddedCalendar = ({
@@ -181,7 +182,7 @@ const Dashboard = () => {
   //FETCH-BOOKINGS Function
   const fetchBookings = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/bookings/my-bookings", {
+      const response = await apiFetch("/api/bookings/my-bookings", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -228,7 +229,7 @@ const Dashboard = () => {
       const isoStart = startTime.toISOString()
       const isoEnd = endTime.toISOString()
 
-      const response = await fetch("http://localhost:5000/api/bookings/availability", {
+      const response = await apiFetch("/api/bookings/availability", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +284,7 @@ const Dashboard = () => {
         ),
       )
 
-      const response = await fetch("http://localhost:5000/api/bookings/create", {
+      const response = await apiFetch("/api/bookings/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -319,7 +320,7 @@ const Dashboard = () => {
       if (!token) return navigate("/login")
 
       try {
-        const response = await fetch("http://localhost:5000/api/auth/dashboard", {
+        const response = await apiFetch("/api/auth/dashboard", {
           headers: { Authorization: `Bearer ${token}` },
         })
         const data = await response.json()
@@ -342,7 +343,7 @@ const Dashboard = () => {
   useEffect(() => {
     const checkRegistrationStatus = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/club-registrations", {
+        const response = await apiFetch("/api/club-registrations", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -370,7 +371,7 @@ const Dashboard = () => {
   const cancelBooking = async (bookingId) => {
     try {
       setLoading(true)
-      const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}`, {
+      const response = await apiFetch(`/api/bookings/${bookingId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

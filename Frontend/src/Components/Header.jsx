@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Link, useLocation } from "react-router-dom"
+import { apiFetch } from "../libs/api"
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -55,7 +56,7 @@ const Header = () => {
       if (!token) return
 
       try {
-        const response = await fetch("http://localhost:5000/api/auth/user", {
+        const response = await apiFetch("/api/auth/user", {
           headers: { Authorization: `Bearer ${token}` },
         })
 

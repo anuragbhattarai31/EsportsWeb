@@ -7,6 +7,7 @@ import { Button } from "@/Components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Header from "../Components/Header"
 import Footer from "../Components/Footer"
+import { apiFetch } from "../libs/api"
 
 export default function TeamDetailsPage() {
   const { id } = useParams()
@@ -16,7 +17,7 @@ export default function TeamDetailsPage() {
   useEffect(() => {
     const fetchTeamData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/teams/${id}`)
+        const response = await apiFetch(`/api/teams/${id}`)
         const data = await response.json()
         setTeamData(data)
       } catch (error) {
