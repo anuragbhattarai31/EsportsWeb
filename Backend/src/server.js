@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+dotenv.config();
 const pool = require("./db"); // Import PostgreSQL connection
 const authRoutes = require("./routes/authRoutes"); // Import auth rout
 const bookingRoutes = require("./routes/bookingRoutes"); // Import booking routes
@@ -12,7 +13,7 @@ const teamRoutes = require('./routes/teamRoutes');
 let server; 
 const path = require('path');
 
-dotenv.config();
+
 const cron = require('node-cron');
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -42,7 +43,7 @@ const uploadsPath = path.join(__dirname, 'public/uploads');
 app.use('/uploads', express.static(uploadsPath));
 console.log('Serving static files from:', uploadsPath);
 console.log('Static files served from:', path.join(__dirname, 'public/uploads'));
-
+console.log('DB_PASSWORD =', process.env.DB_PASSWORD);
 
 // Start the Server
 if (require.main === module) {
