@@ -1,7 +1,7 @@
 // src/lib/api.js
 
 // Read VITE_API_BASE at build time, fall back to localhost in dev
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 /**
  * Wrapper around fetch() that prepends the API base URL.
