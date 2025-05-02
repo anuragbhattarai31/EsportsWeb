@@ -11,9 +11,11 @@ router.post('/', authenticateToken, isAdmin, upload.single('image'), async (req,
     try {
       const { title, excerpt, content } = req.body;
       // Use absolute URL
-      const imageUrl = req.file ? 
-        `http://localhost:5000/uploads/${req.file.filename}` : 
-        null;
+      // Build the public URL based on the actual protocol & host
+      const imageUrl = req.file
+      ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+     : null;
+
   
       const news = await createNews(title, excerpt, content, imageUrl);
       res.status(201).json(news);

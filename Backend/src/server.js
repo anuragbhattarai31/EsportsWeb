@@ -17,6 +17,7 @@ const path = require("path");
 const cron = require("node-cron");
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 5000;
 
 // --- CORS: open to any origin ---
