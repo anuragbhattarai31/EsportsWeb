@@ -4,8 +4,6 @@ import Login from './Auth/Login';
 import Register from './Auth/register'; 
 import Dashboard from './Pages/Dashboard';
 import AdminDashboard from './Pages/Admin-Dashboard';
-import Footer from './Components/Footer';
-import Header from './Components/Header';
 import LandingPage from './Pages/landingpage';
 import ClubRegistration from './Pages/ClubRegistration';
 import './index.css';

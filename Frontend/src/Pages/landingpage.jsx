@@ -220,7 +220,7 @@ export default function LandingPage() {
                 </div>
                 <div className="rounded-lg overflow-hidden shadow-xl shadow-semored/10 border border-gray-700/30 transform hover:scale-105 transition-transform duration-300">
                   <img
-                    src="/public/images/esports-banner.jpg?height=400&width=600"
+                    src="/images/esports-banner.jpg?height=400&width=600"
                     alt="SEMO Esports Team"
                     className="w-full h-auto object-cover"
                   />
@@ -308,7 +308,7 @@ export default function LandingPage() {
               <div className="grid md:grid-cols-2 gap-12 items-center">
                 <div className="rounded-lg overflow-hidden shadow-xl shadow-semored/10 border border-gray-700/30 transform hover:scale-105 transition-transform duration-300">
                   <img
-                    src="/public/images/Esports2.jpg?height=400&width=600"
+                    src="/images/Esports2.jpg?height=400&width=600"
                     alt="SEMO Esports Facility"
                     className="w-full h-auto object-cover"
                   />
