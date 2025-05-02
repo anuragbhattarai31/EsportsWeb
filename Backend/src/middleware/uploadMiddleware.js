@@ -23,7 +23,7 @@ const upload = multer({
     }
     cb(null, true);
   },
-  limits: { fileSize: 20 * 1024 * 1024 } // 5MB
+  limits: { fileSize: 20 * 1024 * 1024 } // 20 MB limit
 });
 
 module.exports = upload;
