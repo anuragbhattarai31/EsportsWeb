@@ -11,6 +11,7 @@ const registerUser = async (req, res) => {
    }
 
     // Server-side email validation
+    //only semo emails 
     const semoEmailRegex = /@semo\.edu$/i;
     if (!semoEmailRegex.test(email)) {
         return res.status(400).json({ error: "Only @semo.edu emails are allowed" });
